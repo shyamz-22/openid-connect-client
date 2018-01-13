@@ -1,0 +1,54 @@
+{
+  "issuer": "https://www.paypal.com",
+  "authorization_endpoint": "https://www.paypal.com/signin/authorize",
+  "token_endpoint": "https://api.paypal.com/v1/oauth2/token",
+  "userinfo_endpoint": "https://api.paypal.com/v1/oauth2/token/userinfo",
+  "jwks_uri": "https://api.paypal.com/v1/oauth2/certs",
+  "token_endpoint_auth_methods_supported": [
+    "client_secret_basic"
+  ],
+  "response_types_supported": [
+    "code",
+    "code id_token"
+  ],
+  "response_modes_supported": [
+    "query",
+    "form_post"
+  ],
+  "grant_types_supported": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "subject_types_supported": [
+    "pairwise"
+  ],
+  "scopes_supported": [
+    "email",
+    "address",
+    "phone",
+    "openid",
+    "profile",
+    "https://uri.paypal.com/services/wallet/sendmoney",
+    "https://uri.paypal.com/services/payments/futurepayments",
+    "https://uri.paypal.com/services/expresscheckout"
+  ],
+  "id_token_signing_alg_values_supported": [
+    "HS256",
+    "RS256"
+  ],
+  "claims_supported": [
+    "aud",
+    "iss",
+    "iat",
+    "exp",
+    "auth_time",
+    "nonce",
+    "sessionIndex",
+    "user_id"
+  ],
+  "code_challenge_methods_supported": [
+    "RS256",
+    "ES256",
+    "S256"
+  ]
+}

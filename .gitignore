@@ -1,4 +1,5 @@
 .gradle
+gradle/
 /build/
 
 # Ignore Gradle GUI config
@@ -18,7 +19,6 @@ gradle-app.setting
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
 
@@ -31,10 +31,6 @@ gradle-app.setting
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 
-# Gradle:
-.idea/**/gradle.xml
-.idea/**/libraries
-
 ## File-based project format:
 *.iws
 
@@ -42,6 +38,10 @@ gradle-app.setting
 
 # IntelliJ
 out/
+
+### IntelliJ IDEA ###
+.idea
+*.ipr
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml

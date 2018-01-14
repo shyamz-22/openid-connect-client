@@ -2,6 +2,7 @@ package io.github.shyamz.openidconnect.authorization
 
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import org.assertj.core.api.AbstractUriAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
@@ -22,7 +23,8 @@ class AuthenticationRequestBuilderTest {
                 .state({ CLIENT_STATE_VALUE })
                 .build()
 
-        assertThat(authenticationRequest).isEqualTo(expectedUrlWithState())
+        authenticationRequestAssert(authenticationRequest)
+                .hasParameter("state", CLIENT_STATE_VALUE)
 
     }
 
@@ -37,7 +39,8 @@ class AuthenticationRequestBuilderTest {
                 .basic()
                 .build()
 
-        assertThat(authenticationRequest).isEqualTo(expectedUrlWithOutState())
+        authenticationRequestAssert(authenticationRequest)
+                .hasNoParameter("state")
     }
 
     @Test
@@ -69,7 +72,7 @@ class AuthenticationRequestBuilderTest {
                 .scope(setOf("openid", "email", "profile"))
                 .build()
 
-        assertThat(authenticationRequest).isEqualTo(expectedUrlWithOutState("openid+email+profile"))
+        authenticationRequestAssert(authenticationRequest, "openid email profile")
     }
 
     @Test
@@ -84,7 +87,8 @@ class AuthenticationRequestBuilderTest {
                 .prompt(setOf(Prompt.SelectAccount, Prompt.Consent))
                 .build()
 
-        assertThat(authenticationRequest).isEqualTo(expectedUrlWithPrompt("select_account+consent"))
+        authenticationRequestAssert(authenticationRequest)
+                .hasParameter("prompt", "select_account consent")
     }
 
     @Test
@@ -103,9 +107,8 @@ class AuthenticationRequestBuilderTest {
                     .build()
         }
                 .isInstanceOf(OpenIdConnectException::class.java)
-                .hasFieldOrPropertyWithValue("message", "prompt 'none' cannot be provided with anyother value")
+                .hasFieldOrPropertyWithValue("message", "prompt 'none' cannot be provided with any other value")
     }
-
 
     @Test
     fun `build - can build a basic flow authentication request with optional parameters`() {
@@ -126,69 +129,31 @@ class AuthenticationRequestBuilderTest {
                 .authenticationContextClassReference(setOf("loa-1", "loa-2"))
                 .build()
 
-        assertThat(authenticationRequest).isEqualTo(expectedUrlWith(
-                responseMode = "query",
-                nonce = NONCE_VALUE,
-                display = "page",
-                maxAge = "3600",
-                uiLocales = "fr-CA+fr+en",
-                idTokenHint = ID_TOKEN_VALUE,
-                loginHint = "abc%40gmail.com",
-                authenticationContextClassReference = "loa-1+loa-2"))
+        authenticationRequestAssert(authenticationRequest)
+                .hasParameter("response_mode" , "query")
+                .hasParameter("nonce" , NONCE_VALUE)
+                .hasParameter("display" , "page")
+                .hasParameter("max_age" , "3600")
+                .hasParameter("ui_locales" , "fr-CA fr en")
+                .hasParameter("id_token_hint" , ID_TOKEN_VALUE)
+                .hasParameter("login_hint" , "abc@gmail.com")
+                .hasParameter("acr_values" , "loa-1 loa-2")
     }
 
-    private fun expectedUrlWithState(): String {
-        return "https://accounts.google.com/o/oauth2/v2/auth?" +
-                "client_id=$CLIENT_ID" +
-                "&redirect_uri=$ENCODED_CLIENT_REDIRECT_URL" +
-                "&scope=openid" +
-                "&response_type=code" +
-                "&state=randomState"
-    }
-
-    private fun expectedUrlWithOutState(scopes: String = "openid"): String {
-        return "https://accounts.google.com/o/oauth2/v2/auth?" +
-                "client_id=$CLIENT_ID" +
-                "&redirect_uri=$ENCODED_CLIENT_REDIRECT_URL" +
-                "&scope=$scopes" +
-                "&response_type=code"
-    }
-
-    private fun expectedUrlWithPrompt(prompt: String): String {
-        return "https://accounts.google.com/o/oauth2/v2/auth?" +
-                "client_id=$CLIENT_ID" +
-                "&redirect_uri=$ENCODED_CLIENT_REDIRECT_URL" +
-                "&scope=openid" +
-                "&response_type=code" +
-                "&prompt=$prompt"
-    }
-
-    private fun expectedUrlWith(responseMode: String,
-                                nonce: String,
-                                display: String,
-                                maxAge: String,
-                                uiLocales: String,
-                                idTokenHint: String,
-                                loginHint: String, authenticationContextClassReference: String): String {
-        return "https://accounts.google.com/o/oauth2/v2/auth?" +
-                "client_id=$CLIENT_ID" +
-                "&redirect_uri=$ENCODED_CLIENT_REDIRECT_URL" +
-                "&scope=openid" +
-                "&response_type=code" +
-                "&response_mode=$responseMode" +
-                "&nonce=$nonce" +
-                "&display=$display" +
-                "&max_age=$maxAge" +
-                "&ui_locales=$uiLocales" +
-                "&id_token_hint=$idTokenHint" +
-                "&login_hint=$loginHint" +
-                "&acr_values=$authenticationContextClassReference"
-
+    private fun authenticationRequestAssert(authenticationRequest: String,
+                                            scopes: String = "openid"): AbstractUriAssert<*> {
+        return assertThat(URI.create(authenticationRequest))
+                .hasHost("accounts.google.com")
+                .hasPath("/o/oauth2/v2/auth")
+                .hasScheme("https")
+                .hasParameter("client_id", CLIENT_ID)
+                .hasParameter("redirect_uri", CLIENT_REDIRECT_URI)
+                .hasParameter("response_type", "code")
+                .hasParameter("scope", scopes)
     }
 
     companion object {
         private val CLIENT_REDIRECT_URI = "https://openidconnect.net/callback"
-        private val ENCODED_CLIENT_REDIRECT_URL = "https%3A%2F%2Fopenidconnect.net%2Fcallback"
         private val CLIENT_ID = "client-id"
         private val CLIENT_STATE_VALUE = "randomState"
         private val NONCE_VALUE = "aVeryRandomValue"

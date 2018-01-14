@@ -8,122 +8,94 @@ import org.apache.http.client.utils.URIBuilder
 class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProviderConfiguration,
                                    private val client: OpenIdClient) {
 
-    private var scope: MutableSet<String> = mutableSetOf("openid")
-    private var state: String? = null
-    private var responseType: ResponseType? = null
-
-    //optional params
-    private var responseMode: String? = null
-    private var nonce: String? = null
-    private var display: Display? = null
-    private var prompts: Set<Prompt>? = null
-    private var maxAge: Long? = null
-    private var locales: Set<String>? = null
-    private var idTokenHint: String? = null
-    private var loginHint: String? = null
-    private var acrValues: Set<String>? = null
-
+    private val authenticationRequestParams: MutableMap<String, String> = mutableMapOf()
 
     fun basic(): AuthenticationRequestBuilder {
-        responseType = ResponseType.Code
+        authenticationRequestParams["response_type"] = ResponseType.Code.type
         return this
     }
 
     fun scope(scopes: Set<String>): AuthenticationRequestBuilder {
-        scope.addAll(scopes)
+        authenticationRequestParams["scope"] = scopes.joinToString(" ")
         return this
     }
 
     fun state(stateGenerator: () -> String): AuthenticationRequestBuilder {
-        this.state = stateGenerator.invoke()
+        authenticationRequestParams["state"] = stateGenerator.invoke()
         return this
     }
 
     fun nonce(nonceGenerator: () -> String): AuthenticationRequestBuilder {
-        this.nonce = nonceGenerator.invoke()
+        authenticationRequestParams["nonce"] = nonceGenerator.invoke()
         return this
     }
 
     fun responseMode(responseMode: String): AuthenticationRequestBuilder {
-        this.responseMode = responseMode
+        authenticationRequestParams["response_mode"] = responseMode
         return this
     }
 
     fun display(display: Display): AuthenticationRequestBuilder {
-        this.display = display
+        authenticationRequestParams["display"] = display.actualValue()
         return this
     }
 
     fun prompt(prompts: Set<Prompt>): AuthenticationRequestBuilder {
-        if (containsNoneWithAnyOtherPrompt(prompts)) {
-            throw OpenIdConnectException("prompt 'none' cannot be provided with anyother value")
-        }
+        authenticationRequestParams["prompt"] = prompts.validate()
+                                                       .joinToString(" ")  { it.actualValue() }
 
-        this.prompts = prompts
         return this
     }
 
-    private fun containsNoneWithAnyOtherPrompt(prompts: Set<Prompt>) =
-            prompts.contains(Prompt.None) && prompts.size > 1
-
     fun maxAge(allowableElapsedTimeInSeconds: Long): AuthenticationRequestBuilder {
-        this.maxAge = allowableElapsedTimeInSeconds
+        authenticationRequestParams["max_age"] = allowableElapsedTimeInSeconds.toString()
         return this
     }
 
     fun uiLocales(locales: Set<String>): AuthenticationRequestBuilder {
-        this.locales = locales
+        authenticationRequestParams["ui_locales"] = locales.joinToString(" ")
         return this
     }
 
     fun idTokenHint(idTokenValue: String): AuthenticationRequestBuilder {
-        this.idTokenHint = idTokenValue
+        authenticationRequestParams["id_token_hint"] = idTokenValue
         return this
     }
 
     fun loginHint(loginHintValue: String): AuthenticationRequestBuilder {
-        this.loginHint= loginHintValue
+        authenticationRequestParams["login_hint"] = loginHintValue
         return this
     }
 
     fun authenticationContextClassReference(acrValues: Set<String>): AuthenticationRequestBuilder {
-        this.acrValues = acrValues
+        authenticationRequestParams["acr_values"] = acrValues.joinToString(" ")
         return this
     }
 
     fun build(): String {
 
-        val responseTypeValue = responseType?.type ?: throw OpenIdConnectException("Please choose a flow type")
-        val displayValue = display?.actualValue()
-        val prompt = prompts?.joinToString(" ") { it.actualValue() }
-        val uiLocales = locales?.joinToString(" ")
-        val acr = acrValues?.joinToString(" ")
+        authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow type")
+        authenticationRequestParams["scope"] ?: authenticationRequestParams.put("scope", "openid")
 
-        val builderWithMandatoryParams = URIBuilder(idProviderConfiguration.authorizationEndpoint)
+        return URIBuilder(idProviderConfiguration.authorizationEndpoint)
                 .addParameter("client_id", client.id)
                 .addParameter("redirect_uri", client.redirectUri)
-                .addParameter("scope", scope.joinToString(" "))
-                .addParameter("response_type", responseTypeValue)
-
-        return builderWithMandatoryParams
-                .addOptionalParam("state", state)
-                .addOptionalParam("response_mode", responseMode)
-                .addOptionalParam("nonce", nonce)
-                .addOptionalParam("display", displayValue)
-                .addOptionalParam("prompt", prompt)
-                .addOptionalParam("max_age", maxAge?.toString())
-                .addOptionalParam("ui_locales", uiLocales)
-                .addOptionalParam("id_token_hint", idTokenHint)
-                .addOptionalParam("login_hint", loginHint)
-                .addOptionalParam("acr_values", acr)
+                .apply {
+                    authenticationRequestParams.forEach {
+                        this.addParameter(it.key, it.value)
+                    }
+                }
                 .build()
                 .toString()
     }
-}
 
-private fun URIBuilder.addOptionalParam(param: String, value: String?): URIBuilder {
-    value?.apply { addParameter(param, value) }
-    return this
+    private fun Set<Prompt>.validate(): Set<Prompt> {
+        if (contains(Prompt.None) && size > 1)
+            throw OpenIdConnectException("prompt 'none' cannot be provided with any other value")
+
+        return this
+    }
+
 }
 
 class OpenIdClient(val id: String,
@@ -140,7 +112,7 @@ enum class Display {
     }
 }
 
-enum class Prompt() {
+enum class Prompt {
     None,
     Login,
     Consent,

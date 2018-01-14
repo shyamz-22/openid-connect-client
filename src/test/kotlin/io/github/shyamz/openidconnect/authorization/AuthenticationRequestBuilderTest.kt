@@ -17,7 +17,7 @@ class AuthenticationRequestBuilderTest {
 
         val authenticationRequest = AuthenticationRequestBuilder(
                 googleProviderConfig,
-                OpenIdClient("id", Companion.CLIENT_REDIRECT_URI))
+                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
                 .basic()
                 .state({"randomState"})
                 .build()
@@ -33,7 +33,7 @@ class AuthenticationRequestBuilderTest {
                 .identityProviderConfiguration()
 
         val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient("id", Companion.CLIENT_REDIRECT_URI))
+                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
                 .basic()
                 .build()
 
@@ -49,7 +49,7 @@ class AuthenticationRequestBuilderTest {
 
         assertThatThrownBy { AuthenticationRequestBuilder(
                 googleProviderConfig,
-                OpenIdClient("id", Companion.CLIENT_REDIRECT_URI))
+                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
                 .build() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasFieldOrPropertyWithValue("message", "Please choose a flow type")
@@ -62,15 +62,13 @@ class AuthenticationRequestBuilderTest {
                 .identityProviderConfiguration()
 
         val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient("id", Companion.CLIENT_REDIRECT_URI))
+                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
                 .basic()
                 .scope(setOf("openid", "email", "profile"))
                 .build()
 
         assertThat(authenticationRequest).isEqualTo(expectedUrlWithOutState("openid+email+profile"))
     }
-
-
 
     private fun expectedUrlWithState(): String {
         return "https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -90,8 +88,9 @@ class AuthenticationRequestBuilderTest {
     }
 
     companion object {
-        private val CLIENT_REDIRECT_URI = "http://myapp.com/callback"
-        private val ENCODED_CLIENT_REDIRECT_URL = "http%3A%2F%2Fmyapp.com%2Fcallback"
+        private val CLIENT_REDIRECT_URI = "https://openidconnect.net/callback"
+        private val ENCODED_CLIENT_REDIRECT_URL = "https%3A%2F%2Fopenidconnect.net%2Fcallback"
+        private val CLIENT_ID = "client-id"
     }
 }
 

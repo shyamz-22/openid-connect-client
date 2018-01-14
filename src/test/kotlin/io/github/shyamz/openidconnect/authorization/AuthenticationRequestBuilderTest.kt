@@ -19,7 +19,7 @@ class AuthenticationRequestBuilderTest {
                 googleProviderConfig,
                 OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
                 .basic()
-                .state({"randomState"})
+                .state({ CLIENT_STATE_VALUE })
                 .build()
 
         assertThat(authenticationRequest).isEqualTo(expectedUrlWithState())
@@ -41,7 +41,7 @@ class AuthenticationRequestBuilderTest {
     }
 
     @Test
-    fun `build - throws Exception when no flow is choosen`() {
+    fun `build - throws Exception when no flow is chosen`() {
 
         val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
                 .identityProviderConfiguration()
@@ -91,6 +91,7 @@ class AuthenticationRequestBuilderTest {
         private val CLIENT_REDIRECT_URI = "https://openidconnect.net/callback"
         private val ENCODED_CLIENT_REDIRECT_URL = "https%3A%2F%2Fopenidconnect.net%2Fcallback"
         private val CLIENT_ID = "client-id"
+        private val CLIENT_STATE_VALUE = "randomState"
     }
 }
 

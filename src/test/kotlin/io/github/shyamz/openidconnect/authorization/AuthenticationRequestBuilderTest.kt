@@ -1,5 +1,10 @@
 package io.github.shyamz.openidconnect.authorization
 
+import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
+import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
+import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
+import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
+import io.github.shyamz.openidconnect.TestConstants.NONCE_VALUE
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import org.assertj.core.api.AbstractUriAssert
@@ -140,9 +145,9 @@ class AuthenticationRequestBuilderTest {
                 .hasParameter("acr_values" , "loa-1 loa-2")
     }
 
-    private fun authenticationRequestAssert(authenticationRequest: String,
+    private fun authenticationRequestAssert(authenticationRequest: AuthorizationRequest,
                                             scopes: String = "openid"): AbstractUriAssert<*> {
-        return assertThat(URI.create(authenticationRequest))
+        return assertThat(URI.create(authenticationRequest.authorizeUrl))
                 .hasHost("accounts.google.com")
                 .hasPath("/o/oauth2/v2/auth")
                 .hasScheme("https")
@@ -150,14 +155,6 @@ class AuthenticationRequestBuilderTest {
                 .hasParameter("redirect_uri", CLIENT_REDIRECT_URI)
                 .hasParameter("response_type", "code")
                 .hasParameter("scope", scopes)
-    }
-
-    companion object {
-        private val CLIENT_REDIRECT_URI = "https://openidconnect.net/callback"
-        private val CLIENT_ID = "client-id"
-        private val CLIENT_STATE_VALUE = "randomState"
-        private val NONCE_VALUE = "aVeryRandomValue"
-        private val ID_TOKEN_VALUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
     }
 }
 

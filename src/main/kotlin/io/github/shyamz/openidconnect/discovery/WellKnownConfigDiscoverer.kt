@@ -6,6 +6,8 @@ import com.mashape.unirest.http.Unirest
 import java.net.URI
 import java.io.IOException
 import com.mashape.unirest.http.ObjectMapper
+import io.github.shyamz.openidconnect.authorization.AuthenticationRequestBuilder
+import io.github.shyamz.openidconnect.authorization.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 
 
@@ -43,5 +45,9 @@ class WellKnownConfigDiscoverer(private val issuer: URI) {
        return Unirest.get(issuer.toString().plus(WELLKNOWN_PATH))
                 .asObject(ProviderConfigurationModel::class.java)
                .body.idProviderConfig()
+    }
+
+    fun authorizeRequest(openIdClient: OpenIdClient): AuthenticationRequestBuilder {
+        return AuthenticationRequestBuilder(identityProviderConfiguration(), openIdClient)
     }
 }

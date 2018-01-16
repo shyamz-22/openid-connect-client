@@ -1,6 +1,9 @@
 package io.github.shyamz.openidconnect.discovery
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.shyamz.openidconnect.TestConstants.GOOGLE_ISSUER
+import io.github.shyamz.openidconnect.TestConstants.PAYPAL_ISSUER
+import io.github.shyamz.openidconnect.TestConstants.YAHOO_ISSUER
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import io.github.shyamz.openidconnect.configuration.model.CodeChallengeMethod.*
 import io.github.shyamz.openidconnect.configuration.model.GrantType
@@ -12,7 +15,6 @@ import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMetho
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethodSupported.Post
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.net.URI
 
 internal class WellKnownConfigDiscovererTest {
 
@@ -106,12 +108,6 @@ internal class WellKnownConfigDiscovererTest {
                 "user_id")
         assertThat(paypal.codeChallengeMethods).containsExactlyInAnyOrder(RS256, ES256, S256)
         assertThat(paypal.grantTypes).containsExactlyInAnyOrder(*GrantType.values())
-    }
-
-    companion object {
-        private val GOOGLE_ISSUER = URI.create("https://accounts.google.com/")
-        private val YAHOO_ISSUER = URI.create("https://api.login.yahoo.com")
-        private val PAYPAL_ISSUER = URI.create("https://www.paypal.com")
     }
 
     private fun expectedIdPConfiguration(provider: String): IdProviderConfiguration {

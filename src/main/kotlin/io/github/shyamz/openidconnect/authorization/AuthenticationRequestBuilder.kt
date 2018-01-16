@@ -72,12 +72,12 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
         return this
     }
 
-    fun build(): String {
+    fun build(): AuthorizationRequest {
 
         authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow type")
         authenticationRequestParams["scope"] ?: authenticationRequestParams.put("scope", "openid")
 
-        return URIBuilder(idProviderConfiguration.authorizationEndpoint)
+        val authorizeUrl = URIBuilder(idProviderConfiguration.authorizationEndpoint)
                 .addParameter("client_id", client.id)
                 .addParameter("redirect_uri", client.redirectUri)
                 .apply {
@@ -87,6 +87,8 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
                 }
                 .build()
                 .toString()
+
+        return AuthorizationRequest(authorizeUrl)
     }
 
     private fun Set<Prompt>.validate(): Set<Prompt> {

@@ -1,2 +1,2 @@
 # openid-connect-java-client
-OpenId Connect Java Client
+OpenId Connect Client written in Kotlin

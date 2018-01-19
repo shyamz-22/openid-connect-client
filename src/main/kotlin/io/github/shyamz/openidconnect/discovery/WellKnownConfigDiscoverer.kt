@@ -2,13 +2,13 @@ package io.github.shyamz.openidconnect.discovery
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.mashape.unirest.http.Unirest
-import java.net.URI
-import java.io.IOException
 import com.mashape.unirest.http.ObjectMapper
+import com.mashape.unirest.http.Unirest
 import io.github.shyamz.openidconnect.authorization.AuthenticationRequestBuilder
 import io.github.shyamz.openidconnect.authorization.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
+import java.io.IOException
+import java.net.URI
 
 
 class WellKnownConfigDiscoverer(private val issuer: URI) {
@@ -41,10 +41,10 @@ class WellKnownConfigDiscoverer(private val issuer: URI) {
         private const val WELLKNOWN_PATH = "/.well-known/openid-configuration"
     }
 
-    fun identityProviderConfiguration() : IdProviderConfiguration {
-       return Unirest.get(issuer.toString().plus(WELLKNOWN_PATH))
+    fun identityProviderConfiguration(): IdProviderConfiguration {
+        return Unirest.get(issuer.toString().plus(WELLKNOWN_PATH))
                 .asObject(ProviderConfigurationModel::class.java)
-               .body.idProviderConfig()
+                .body.idProviderConfig()
     }
 
     fun authorizeRequest(openIdClient: OpenIdClient): AuthenticationRequestBuilder {

@@ -7,7 +7,7 @@ import javax.servlet.*
 import javax.servlet.http.*
 
 class MockHttpServletRequest(private val requestUri: String,
-                             private val queryParams: Map<String, Array<String>>): HttpServletRequest {
+                             private val queryParams: Map<String, Array<String>>) : HttpServletRequest {
 
     override fun isUserInRole(role: String?): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -262,7 +262,7 @@ class MockHttpServletRequest(private val requestUri: String,
     }
 
     override fun getRequestURI(): String {
-       return requestUri
+        return requestUri
     }
 
     override fun getRequestDispatcher(path: String?): RequestDispatcher {

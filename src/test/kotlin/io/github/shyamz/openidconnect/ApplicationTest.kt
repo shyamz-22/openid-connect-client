@@ -1,17 +1,11 @@
 package io.github.shyamz.openidconnect
 
-import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
-import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
-import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.authorization.OpenIdClient
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
-import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import io.github.shyamz.openidconnect.mocks.MockHttpServletResponse
-import io.github.shyamz.openidconnect.provider.response.OpenIdConnectCallBackInterceptor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.net.URI
-import javax.servlet.http.HttpServletRequest
 
 class ApplicationTest {
 

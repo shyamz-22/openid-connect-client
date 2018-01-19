@@ -42,7 +42,7 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
 
     fun prompt(prompts: Set<Prompt>): AuthenticationRequestBuilder {
         authenticationRequestParams["prompt"] = prompts.validate()
-                                                       .joinToString(" ")  { it.actualValue() }
+                .joinToString(" ") { it.actualValue() }
 
         return this
     }

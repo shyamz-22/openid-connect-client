@@ -7,13 +7,11 @@ import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NONCE_VALUE
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import org.assertj.core.api.AbstractUriAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
 import java.net.URI
-import javax.servlet.http.HttpServletRequest
 
 class AuthenticationRequestBuilderTest {
 
@@ -137,14 +135,14 @@ class AuthenticationRequestBuilderTest {
                 .build()
 
         authenticationRequestAssert(authenticationRequest)
-                .hasParameter("response_mode" , "query")
-                .hasParameter("nonce" , NONCE_VALUE)
-                .hasParameter("display" , "page")
-                .hasParameter("max_age" , "3600")
-                .hasParameter("ui_locales" , "fr-CA fr en")
-                .hasParameter("id_token_hint" , ID_TOKEN_VALUE)
-                .hasParameter("login_hint" , "abc@gmail.com")
-                .hasParameter("acr_values" , "loa-1 loa-2")
+                .hasParameter("response_mode", "query")
+                .hasParameter("nonce", NONCE_VALUE)
+                .hasParameter("display", "page")
+                .hasParameter("max_age", "3600")
+                .hasParameter("ui_locales", "fr-CA fr en")
+                .hasParameter("id_token_hint", ID_TOKEN_VALUE)
+                .hasParameter("login_hint", "abc@gmail.com")
+                .hasParameter("acr_values", "loa-1 loa-2")
     }
 
     private fun authenticationRequestAssert(authenticationRequest: AuthorizationRequest,

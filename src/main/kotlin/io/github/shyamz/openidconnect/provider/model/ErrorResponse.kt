@@ -5,4 +5,4 @@ package io.github.shyamz.openidconnect.provider.model
  */
 data class ErrorResponse(val error: String,
                          val errorDescription: String? = null,
-                         val errorUri: String? =  null)
+                         val errorUri: String? = null)

@@ -57,9 +57,20 @@ git pull --rebase
 
 if [ $? -eq 0 ]
 then
-  echo "Can push to $remote"
+  echo "Rebased Successfully"
 	exit 0
 else
-  echo "Cannot push to $remote" >&2
+  echo "Rebase failure, Cannot push to $remote" >&2
+	exit 1
+fi
+
+./gradlew clean test
+
+if [ $? -eq 0 ]
+then
+  echo "Tested Successfully, Pushing to $remote"
+	exit 0
+else
+  echo "Test Failure, Cannot push to $remote" >&2
 	exit 1
 fi

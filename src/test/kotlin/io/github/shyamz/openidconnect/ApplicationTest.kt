@@ -37,9 +37,4 @@ class ApplicationTest {
 
         assertThat(mockHttpServletResponse.isRedirectedTo(AUTHORIZE_URL)).isTrue()
     }
-
-    @Test
-    fun `can extract authorization code from request`() {
-
-    }
 }

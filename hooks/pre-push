@@ -30,7 +30,7 @@ check_for_wip_commit() {
 }
 
 pull() {
-	echo "Performing git pull --rebase"
+	echo "Applying latest changes from $remote"
 	git pull --rebase
 
 	if [ $? -ne 0 ]

@@ -66,6 +66,8 @@ fi
 
 echo "Running tests"
 
+cd ../../
+
 ./gradlew clean test
 
 if [ $? -eq 0 ]

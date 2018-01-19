@@ -1,4 +1,4 @@
-package io.github.shyamz.openidconnect.authorization
+package io.github.shyamz.openidconnect.authorization.request
 
 import javax.servlet.http.HttpServletResponse
 

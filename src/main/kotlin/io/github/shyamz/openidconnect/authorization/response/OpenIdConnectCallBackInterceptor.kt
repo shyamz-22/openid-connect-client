@@ -1,9 +1,9 @@
-package io.github.shyamz.openidconnect.provider.response
+package io.github.shyamz.openidconnect.authorization.response
 
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.provider.model.BasicFlowResponse
-import io.github.shyamz.openidconnect.provider.model.ErrorResponse
+import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
+import io.github.shyamz.openidconnect.authorization.response.model.ErrorResponse
 import javax.servlet.http.HttpServletRequest
 
 
@@ -15,13 +15,13 @@ class OpenIdConnectCallBackInterceptor(private val request: HttpServletRequest) 
      * @See: http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes
      */
 
-    fun extractAuthorizationCode(storedState: String? = null): BasicFlowResponse {
+    fun extractAuthorizationCode(storedState: String? = null): AuthorizationCodeGrant {
         val authorizationCode = request.getParameter(ResponseType.Code.parameter)
         val state = request.getParameter("state")
 
         validateState(storedState, state)
 
-        return authorizationCode?.let { BasicFlowResponse(it) }
+        return authorizationCode?.let { AuthorizationCodeGrant(it) }
                 ?: throw authenticationRequestError(request)
 
     }

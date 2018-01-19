@@ -13,7 +13,7 @@ data class IdProviderConfiguration(val issuer: URI,
                                    val scopes: List<String> = emptyList(),
                                    val claims: List<String> = emptyList(),
                                    val grantTypes: List<GrantType> = emptyList(),
-                                   val tokenEndpointAuthMethods: List<TokenEndPointAuthMethodSupported> = emptyList(),
+                                   val tokenEndpointAuthMethods: List<TokenEndPointAuthMethod> = emptyList(),
                                    val codeChallengeMethods: List<CodeChallengeMethod> = emptyList(),
                                    val userInfoEndPoint: URI? = null,
                                    val revocationEndPoint: URI? = null)

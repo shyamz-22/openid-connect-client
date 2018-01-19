@@ -7,7 +7,8 @@ import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.DIFFERENT_CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
-import io.github.shyamz.openidconnect.provider.model.ErrorResponse
+import io.github.shyamz.openidconnect.authorization.response.OpenIdConnectCallBackInterceptor
+import io.github.shyamz.openidconnect.authorization.response.model.ErrorResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
@@ -31,7 +32,7 @@ class OpenIdConnectCallBackInterceptorTest {
 
         //THEN
         assertThat(basicFlowResponse).isNotNull()
-                .hasFieldOrPropertyWithValue("authorizationCode", AUTH_CODE_VALUE)
+                .hasFieldOrPropertyWithValue("code", AUTH_CODE_VALUE)
     }
 
     @Test
@@ -52,7 +53,7 @@ class OpenIdConnectCallBackInterceptorTest {
 
         //THEN
         assertThat(basicFlowResponse).isNotNull()
-                .hasFieldOrPropertyWithValue("authorizationCode", AUTH_CODE_VALUE)
+                .hasFieldOrPropertyWithValue("code", AUTH_CODE_VALUE)
     }
 
     @Test

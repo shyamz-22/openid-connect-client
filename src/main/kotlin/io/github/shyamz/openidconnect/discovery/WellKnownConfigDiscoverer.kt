@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.mashape.unirest.http.ObjectMapper
 import com.mashape.unirest.http.Unirest
-import io.github.shyamz.openidconnect.authorization.AuthenticationRequestBuilder
-import io.github.shyamz.openidconnect.authorization.OpenIdClient
+import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
+import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import java.io.IOException
 import java.net.URI

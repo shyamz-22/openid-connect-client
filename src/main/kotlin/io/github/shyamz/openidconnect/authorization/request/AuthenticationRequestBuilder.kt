@@ -1,4 +1,4 @@
-package io.github.shyamz.openidconnect.authorization
+package io.github.shyamz.openidconnect.authorization.request
 
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
@@ -101,7 +101,8 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
 }
 
 class OpenIdClient(val id: String,
-                   val redirectUri: String)
+                   val redirectUri: String,
+                   val secret: String? = null)
 
 enum class Display {
     Page,

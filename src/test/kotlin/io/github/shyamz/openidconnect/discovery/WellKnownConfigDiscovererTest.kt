@@ -11,8 +11,8 @@ import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.configuration.model.ResponseType.*
 import io.github.shyamz.openidconnect.configuration.model.SigningAlgorithm
 import io.github.shyamz.openidconnect.configuration.model.SubjectType
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethodSupported.Basic
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethodSupported.Post
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 

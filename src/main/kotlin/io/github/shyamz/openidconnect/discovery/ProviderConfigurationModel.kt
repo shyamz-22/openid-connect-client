@@ -40,11 +40,11 @@ internal data class ProviderConfigurationModel(private val issuer: URI,
                 }
     }
 
-    private fun authMethods(): List<TokenEndPointAuthMethodSupported> {
+    private fun authMethods(): List<TokenEndPointAuthMethod> {
 
         return token_endpoint_auth_methods_supported
                 .map {
-                    TokenEndPointAuthMethodSupported.values().find { authMethod ->
+                    TokenEndPointAuthMethod.values().find { authMethod ->
                         authMethod.supportedMethod == it
                     } ?: throw RuntimeException("unsupported auth method: $token_endpoint_auth_methods_supported")
                 }

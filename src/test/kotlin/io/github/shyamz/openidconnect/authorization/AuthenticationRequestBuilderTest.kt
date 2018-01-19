@@ -7,11 +7,13 @@ import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NONCE_VALUE
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import org.assertj.core.api.AbstractUriAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
 import java.net.URI
+import javax.servlet.http.HttpServletRequest
 
 class AuthenticationRequestBuilderTest {
 
@@ -62,7 +64,7 @@ class AuthenticationRequestBuilderTest {
                     .build()
         }
                 .isInstanceOf(OpenIdConnectException::class.java)
-                .hasFieldOrPropertyWithValue("message", "Please choose a flow type")
+                .hasFieldOrPropertyWithValue("message", "Please choose a flow parameter")
     }
 
     @Test
@@ -157,4 +159,3 @@ class AuthenticationRequestBuilderTest {
                 .hasParameter("scope", scopes)
     }
 }
-

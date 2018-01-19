@@ -11,7 +11,7 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
     private val authenticationRequestParams: MutableMap<String, String> = mutableMapOf()
 
     fun basic(): AuthenticationRequestBuilder {
-        authenticationRequestParams["response_type"] = ResponseType.Code.type
+        authenticationRequestParams["response_type"] = ResponseType.Code.parameter
         return this
     }
 
@@ -74,7 +74,7 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
 
     fun build(): AuthorizationRequest {
 
-        authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow type")
+        authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow parameter")
         authenticationRequestParams["scope"] ?: authenticationRequestParams.put("scope", "openid")
 
         val authorizeUrl = URIBuilder(idProviderConfiguration.authorizationEndpoint)

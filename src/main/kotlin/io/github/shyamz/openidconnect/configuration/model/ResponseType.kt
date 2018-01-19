@@ -1,6 +1,6 @@
 package io.github.shyamz.openidconnect.configuration.model
 
-enum class ResponseType(val type: String) {
+enum class ResponseType(val parameter: String) {
     Code("code"),
     Token("token"),
     IdToken("id_token"),

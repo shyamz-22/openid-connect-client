@@ -25,7 +25,7 @@ internal data class ProviderConfigurationModel(private val issuer: URI,
 
         return response_types_supported
                 .map {
-                    ResponseType.values().find { type -> type.type == it }
+                    ResponseType.values().find { type -> type.parameter == it }
                             ?: throw RuntimeException("unsupported response types: $response_types_supported")
                 }
     }

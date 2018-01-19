@@ -1,3 +1,6 @@
 package io.github.shyamz.openidconnect.exceptions
 
-class OpenIdConnectException(message: String): RuntimeException(message)
+import io.github.shyamz.openidconnect.provider.model.ErrorResponse
+
+class OpenIdConnectException(message: String,
+                             val errorResponse: ErrorResponse? = null): RuntimeException(message)

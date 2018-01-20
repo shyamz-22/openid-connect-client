@@ -2,11 +2,10 @@ package io.github.shyamz.openidconnect
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
-import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
-import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
+import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
@@ -64,8 +63,8 @@ class ApplicationTest {
 
 
         val tokenService = TokenService(MockIdentityProviderConfiguration.get(),
-                                        OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET),
-                                        TokenEndPointAuthMethod.Basic)
+                OPEN_ID_CLIENT,
+                TokenEndPointAuthMethod.Basic)
 
 
         val tokens = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)

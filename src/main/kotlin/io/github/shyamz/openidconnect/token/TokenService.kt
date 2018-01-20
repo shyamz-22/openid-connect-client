@@ -1,10 +1,7 @@
 package io.github.shyamz.openidconnect.token
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.mashape.unirest.http.ObjectMapper
-import com.mashape.unirest.http.Unirest
 import com.mashape.unirest.request.body.MultipartBody
+import io.github.shyamz.openidconnect.UnirestFactory
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
@@ -13,39 +10,14 @@ import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMetho
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
-import java.io.IOException
 
 class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
                    private val openIdClient: OpenIdClient,
                    private val authMethod: TokenEndPointAuthMethod = Basic) {
 
-    init {
-        Unirest.setObjectMapper(object : ObjectMapper {
-            private val objectMapper = jacksonObjectMapper()
-
-            override fun <T> readValue(value: String, valueType: Class<T>): T {
-                try {
-                    return objectMapper.readValue(value, valueType)
-                } catch (e: IOException) {
-                    throw RuntimeException(e)
-                }
-
-            }
-
-            override fun writeValue(value: Any): String {
-                try {
-                    return objectMapper.writeValueAsString(value)
-                } catch (e: JsonProcessingException) {
-                    throw RuntimeException(e)
-                }
-
-            }
-        })
-    }
-
     fun exchange(authorizationCodeGrant: AuthorizationCodeGrant): BasicFlowResponse {
 
-        return Unirest.post(idProviderConfiguration.tokenEndpoint.toString())
+        return UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
                 .field("grant_type", authorizationCodeGrant.grantType)
                 .field("code", authorizationCodeGrant.code)

@@ -5,10 +5,10 @@ import io.github.shyamz.openidconnect.TestConstants.BLANK
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.DIFFERENT_CLIENT_STATE_VALUE
-import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import io.github.shyamz.openidconnect.authorization.response.OpenIdConnectCallBackInterceptor
 import io.github.shyamz.openidconnect.authorization.response.model.ErrorResponse
+import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test

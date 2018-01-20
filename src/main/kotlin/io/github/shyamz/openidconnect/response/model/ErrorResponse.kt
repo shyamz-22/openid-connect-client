@@ -1,4 +1,4 @@
-package io.github.shyamz.openidconnect.authorization.response.model
+package io.github.shyamz.openidconnect.response.model
 
 /**
  * https://tools.ietf.org/html/rfc6749#section-4.2.1

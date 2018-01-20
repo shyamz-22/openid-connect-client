@@ -1,4 +1,4 @@
-package io.github.shyamz.openidconnect.authorization.response.model
+package io.github.shyamz.openidconnect.response.model
 
 import io.github.shyamz.openidconnect.configuration.model.GrantType
 

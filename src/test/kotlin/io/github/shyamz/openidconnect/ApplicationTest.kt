@@ -8,13 +8,13 @@ import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
-import io.github.shyamz.openidconnect.authorization.response.OpenIdConnectCallBackInterceptor
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import io.github.shyamz.openidconnect.mocks.MockHttpServletResponse
 import io.github.shyamz.openidconnect.mocks.MockIdentityProviderConfiguration
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
+import io.github.shyamz.openidconnect.response.OpenIdConnectCallBackInterceptor
 import io.github.shyamz.openidconnect.token.TokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule

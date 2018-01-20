@@ -6,14 +6,19 @@ import io.github.shyamz.openidconnect.TestConstants
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
+import io.github.shyamz.openidconnect.TestConstants.INVALID_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
-import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
+import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
+import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.MockIdentityProviderConfiguration
+import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBadRequest
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithPostAuth
+import io.github.shyamz.openidconnect.response.model.ErrorResponse
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,12 +31,14 @@ class TokenServiceTest {
 
     @Test
     fun `exchange - can exchange tokens with basic authentication`() {
-
+        //GIVEN
         stubForTokenResponseWithBasicAuth()
 
+        //WHEN
         val basicFlowResponse = TokenService(MockIdentityProviderConfiguration.get(), OPEN_ID_CLIENT, Basic)
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
+        //THEN
         assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
         assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
         assertThat(basicFlowResponse.accessToken).isEqualTo(TestConstants.ACCESS_TOKEN_VALUE)
@@ -45,12 +52,15 @@ class TokenServiceTest {
 
     @Test
     fun `exchange - can exchange tokens with post authentication`() {
-
+        //GIVEN
         stubForTokenResponseWithPostAuth()
+        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
 
-        val basicFlowResponse = TokenService(MockIdentityProviderConfiguration.get(), OPEN_ID_CLIENT, Post)
+        //WHEN
+        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
+        //THEN
         assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
         assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
         assertThat(basicFlowResponse.accessToken).isEqualTo(TestConstants.ACCESS_TOKEN_VALUE)
@@ -59,6 +69,31 @@ class TokenServiceTest {
 
         verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
                 equalTo("client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=SplxlOBeZQQYbYS6WxSbIA" +
-                "&grant_type=AuthorizationCode&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+                        "&grant_type=AuthorizationCode&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+    }
+
+
+    @Test
+    fun `exchange - throws exception when something fails`() {
+        //GIVEN
+        stubForTokenResponseWithBadRequest()
+        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+
+        //WHEN
+        val basicFlowResponseWithError = assertThatThrownBy { TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+                .exchange(AuthorizationCodeGrant(INVALID_CODE_VALUE)) }
+
+        //THEN
+        basicFlowResponseWithError
+                .isInstanceOf(OpenIdConnectException::class.java)
+                .hasFieldOrPropertyWithValue("errorResponse",
+                        ErrorResponse("invalid_grant",
+                                      "Authorization code is invalid or expired",
+                                      "https://tools.ietf.org/html/rfc6749#section-5.2"))
+
+
+        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
+                equalTo("client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=$INVALID_CODE_VALUE" +
+                        "&grant_type=AuthorizationCode&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
     }
 }

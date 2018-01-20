@@ -2,12 +2,14 @@ package io.github.shyamz.openidconnect.token
 
 import com.mashape.unirest.request.body.MultipartBody
 import io.github.shyamz.openidconnect.UnirestFactory
+import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
-import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
+import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
 
@@ -17,15 +19,18 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
 
     fun exchange(authorizationCodeGrant: AuthorizationCodeGrant): BasicFlowResponse {
 
-        return UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
+        val result = UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
                 .field("grant_type", authorizationCodeGrant.grantType)
                 .field("code", authorizationCodeGrant.code)
                 .field("redirect_uri", openIdClient.redirectUri)
                 .addAuthentication()
                 .asObject(TokenResponse::class.java)
-                .body
-                .toBasicFlowResponse()
+
+        return when(result.status) {
+            200 -> result.body.toBasicFlowResponse()
+            else -> throw OpenIdConnectException("Error while exchanging code for token", result.body.toErrorResponse())
+        }
     }
 
     private fun MultipartBody.addAuthentication(): MultipartBody {

@@ -1,9 +1,9 @@
-package io.github.shyamz.openidconnect.authorization.response
+package io.github.shyamz.openidconnect.response
 
-import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
-import io.github.shyamz.openidconnect.authorization.response.model.ErrorResponse
+import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.response.model.ErrorResponse
 import javax.servlet.http.HttpServletRequest
 
 

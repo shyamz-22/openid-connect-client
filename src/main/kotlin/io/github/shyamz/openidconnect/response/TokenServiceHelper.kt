@@ -1,7 +1,7 @@
-package io.github.shyamz.openidconnect.authorization.response
+package io.github.shyamz.openidconnect.response
 
-import io.github.shyamz.openidconnect.authorization.response.model.AuthorizationCodeGrant
-import io.github.shyamz.openidconnect.token.BasicFlowResponse
+import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
+import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import io.github.shyamz.openidconnect.token.TokenService
 
 data class TokenServiceHelper(private val tokenService: TokenService,

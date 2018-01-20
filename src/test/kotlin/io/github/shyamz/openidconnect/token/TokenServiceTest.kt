@@ -46,7 +46,7 @@ class TokenServiceTest {
         assertThat(basicFlowResponse.refreshToken).isEqualTo(TestConstants.REFRESH_TOKEN_VALUE)
 
         verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("code=SplxlOBeZQQYbYS6WxSbIA&grant_type=AuthorizationCode" +
+                equalTo("code=SplxlOBeZQQYbYS6WxSbIA&grant_type=authorization_code" +
                 "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
     }
 
@@ -69,7 +69,7 @@ class TokenServiceTest {
 
         verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
                 equalTo("client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=SplxlOBeZQQYbYS6WxSbIA" +
-                        "&grant_type=AuthorizationCode&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+                        "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
     }
 
 
@@ -94,6 +94,6 @@ class TokenServiceTest {
 
         verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
                 equalTo("client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=$INVALID_CODE_VALUE" +
-                        "&grant_type=AuthorizationCode&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+                        "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
     }
 }

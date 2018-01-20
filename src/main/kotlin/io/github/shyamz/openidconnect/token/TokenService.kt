@@ -21,7 +21,7 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
 
         val result = UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
-                .field("grant_type", authorizationCodeGrant.grantType)
+                .field("grant_type", authorizationCodeGrant.grantType.grant)
                 .field("code", authorizationCodeGrant.code)
                 .field("redirect_uri", openIdClient.redirectUri)
                 .addAuthentication()

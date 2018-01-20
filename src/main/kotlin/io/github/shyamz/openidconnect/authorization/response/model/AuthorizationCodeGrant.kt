@@ -5,8 +5,7 @@ import io.github.shyamz.openidconnect.configuration.model.GrantType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.token.TokenService
 
-data class AuthorizationCodeGrant(val code: String,
-                                  val grantType: GrantType = GrantType.AuthorizationCode) {
+data class AuthorizationCodeGrant(val code: String) : Grant(GrantType.AuthorizationCode) {
     init {
         with(code) {
             if (this.isBlank()) {

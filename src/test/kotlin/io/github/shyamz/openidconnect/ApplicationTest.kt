@@ -31,6 +31,7 @@ class ApplicationTest {
     fun `can build authentication request fluently`() {
 
         val authorizeRequest = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
+                .identityProviderConfiguration()
                 .authorizeRequest(OpenIdClient("id", "http://redirect-uri"))
                 .basic()
                 .build()
@@ -44,6 +45,7 @@ class ApplicationTest {
         val mockHttpServletResponse = MockHttpServletResponse()
 
         WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
+                .identityProviderConfiguration()
                 .authorizeRequest(OpenIdClient("id", "http://redirect-uri"))
                 .basic()
                 .build()

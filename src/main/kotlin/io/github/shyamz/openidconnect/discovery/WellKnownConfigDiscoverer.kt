@@ -1,8 +1,6 @@
 package io.github.shyamz.openidconnect.discovery
 
 import io.github.shyamz.openidconnect.UnirestFactory
-import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
-import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import java.net.URI
 
@@ -16,9 +14,5 @@ class WellKnownConfigDiscoverer(private val issuer: URI) {
         return UnirestFactory().get(issuer.toString().plus(WELLKNOWN_PATH))
                 .asObject(ProviderConfigurationModel::class.java)
                 .body.idProviderConfig()
-    }
-
-    fun authorizeRequest(openIdClient: OpenIdClient): AuthenticationRequestBuilder {
-        return AuthenticationRequestBuilder(identityProviderConfiguration(), openIdClient)
     }
 }

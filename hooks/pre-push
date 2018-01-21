@@ -30,18 +30,17 @@ check_for_wip_commit() {
 }
 
 check_for_unTracked_files() {
-    echo "Checking for untracked files"
+    echo "Checking for un tracked files"
 
     local unTrackedFiles=$(git ls-files --others --exclude-standard)
 
     if [ -n "$unTrackedFiles" ]
 	then
 		echo >&2 "$(tput setaf 1)Found Untracked files(s):$(tput sgr 0)"
-		echo >&2 "$unTrackedFiles"
+		echo >&2 "$(tput setaf 3)$unTrackedFiles$(tput sgr 0)"
 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
 		exit 1
 	fi
-
 }
 
 pull() {

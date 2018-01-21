@@ -1,5 +1,6 @@
 package io.github.shyamz.openidconnect.token
 
+import com.mashape.unirest.http.HttpResponse
 import com.mashape.unirest.request.body.MultipartBody
 import io.github.shyamz.openidconnect.UnirestFactory
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
@@ -10,6 +11,7 @@ import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMetho
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
+import io.github.shyamz.openidconnect.response.model.Grant
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
 
@@ -19,36 +21,36 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
 
     fun exchange(authorizationCodeGrant: AuthorizationCodeGrant): BasicFlowResponse {
 
-        val result = UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
-                .field("grant_type", authorizationCodeGrant.grantType.grant)
+        val result = basicTokenEndpointRequest(authorizationCodeGrant)
                 .field("code", authorizationCodeGrant.code)
-                .field("redirect_uri", openIdClient.redirectUri)
-                .addAuthentication()
-                .asObject(TokenResponse::class.java)
+                .asTokenResponse()
 
-        return when(result.status) {
-            200 -> result.body.toBasicFlowResponse()
-            else -> throw OpenIdConnectException("Error while exchanging code for token", result.body.toErrorResponse())
-        }
+        return handleTokenEndpointResponse(result)
     }
 
     fun refresh(refreshTokenGrant: RefreshTokenGrant): BasicFlowResponse {
 
-        val result = UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
-                .field("grant_type", refreshTokenGrant.grantType.grant)
+        val result = basicTokenEndpointRequest(refreshTokenGrant)
                 .field("refresh_token", refreshTokenGrant.refreshToken)
+                .asTokenResponse()
+
+        return handleTokenEndpointResponse(result)
+    }
+
+    private fun basicTokenEndpointRequest(grant: Grant): MultipartBody {
+        return UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
+                .field("grant_type", grant.grantType.grant)
                 .field("redirect_uri", openIdClient.redirectUri)
                 .addAuthentication()
-                .asObject(TokenResponse::class.java)
+    }
 
-        return when(result.status) {
+    private fun handleTokenEndpointResponse(result: HttpResponse<TokenResponse>): BasicFlowResponse {
+        return when (result.status) {
             200 -> result.body.toBasicFlowResponse()
             else -> throw OpenIdConnectException("Error while exchanging code for token", result.body.toErrorResponse())
         }
     }
-
 
     private fun MultipartBody.addAuthentication(): MultipartBody {
         return when (authMethod) {
@@ -61,4 +63,6 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
         return this.field("client_id", id)
                 .field("client_secret", secret)
     }
+
+    private fun MultipartBody.asTokenResponse() = this.asObject(TokenResponse::class.java)
 }

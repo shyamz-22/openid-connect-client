@@ -32,10 +32,7 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
 
         val result = basicTokenEndpointRequest(refreshTokenGrant)
                 .field("refresh_token", refreshTokenGrant.refreshToken)
-                .apply {
-                    scope.takeIf { it.isNotEmpty() }
-                    ?.apply { field("scope", scope.joinToString(" "))}
-                }
+                .apply { scope.takeIf { it.isNotEmpty() }?.apply { field("scope", scope.joinToString(" "))} }
                 .asTokenResponse()
 
         return handleTokenEndpointResponse(result)

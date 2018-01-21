@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 check_for_wip_commit() {
-	echo "Checking for WIP Commits"
 	while read local_ref local_sha remote_ref remote_sha
 	do
 		if [ "$local_sha" = $z40 ]
@@ -27,11 +26,10 @@ check_for_wip_commit() {
 			fi
 		fi
 	done
+	echo "Checking for WIP Commits $(tput setaf 2)✔$(tput sgr 0)"
 }
 
 check_for_unTracked_files() {
-    echo "Checking for un tracked files"
-
     local unTrackedFiles=$(git ls-files --others --exclude-standard)
 
     if [ -n "$unTrackedFiles" ]
@@ -41,10 +39,10 @@ check_for_unTracked_files() {
 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
 		exit 1
 	fi
+	echo "Checking for un tracked files $(tput setaf 2)✔$(tput sgr 0)"
 }
 
 pull() {
-	echo "Applying latest changes from $remote"
 	git pull --rebase
 
 	if [ $? -ne 0 ]
@@ -52,10 +50,10 @@ pull() {
 	  echo "$(tput setaf 1)Rebase failure, Cannot push to $remote$(tput sgr 0)" >&2
 	  exit 1
 	fi
+	echo "Applying latest changes from $remote $(tput setaf 2)✔$(tput sgr 0)"
 }
 
 run_tests() {
-	echo "Running tests"
 	./gradlew clean build
 
 	if [ $? -ne 0 ]
@@ -63,6 +61,7 @@ run_tests() {
 		echo "$(tput setaf 1)Tests failed, Cannot push to $remote$(tput sgr 0)" >&2
 	  exit 1
 	fi
+	echo "Running tests $(tput setaf 2)✔$(tput sgr 0)"
 }
 
 remote="$1"

@@ -21,22 +21,21 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
 
     fun exchange(authorizationCodeGrant: AuthorizationCodeGrant): BasicFlowResponse {
 
-        val result = basicTokenEndpointRequest(authorizationCodeGrant)
+        return basicTokenEndpointRequest(authorizationCodeGrant)
                 .field("code", authorizationCodeGrant.code)
                 .asTokenResponse()
-
-        return handleTokenEndpointResponse(result)
+                .handleResponse()
     }
 
     fun refresh(refreshTokenGrant: RefreshTokenGrant, scope: Set<String> = emptySet()): BasicFlowResponse {
 
-        val result = basicTokenEndpointRequest(refreshTokenGrant)
+        return basicTokenEndpointRequest(refreshTokenGrant)
                 .field("refresh_token", refreshTokenGrant.refreshToken)
                 .apply { scope.takeIf { it.isNotEmpty() }?.apply { field("scope", scope.joinToString(" "))} }
                 .asTokenResponse()
-
-        return handleTokenEndpointResponse(result)
+                .handleResponse()
     }
+
 
     private fun basicTokenEndpointRequest(grant: Grant): MultipartBody {
         return UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
@@ -46,17 +45,17 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
                 .addAuthentication()
     }
 
-    private fun handleTokenEndpointResponse(result: HttpResponse<TokenResponse>): BasicFlowResponse {
-        return when (result.status) {
-            200 -> result.body.toBasicFlowResponse()
-            else -> throw OpenIdConnectException("Error while exchanging code for token", result.body.toErrorResponse())
-        }
-    }
-
     private fun MultipartBody.addAuthentication(): MultipartBody {
         return when (authMethod) {
             Basic -> basicAuth(openIdClient.id, openIdClient.secret)
             Post -> postAuth(openIdClient.id, openIdClient.secret)
+        }
+    }
+
+    private fun HttpResponse<TokenResponse>.handleResponse(): BasicFlowResponse {
+        return when (status) {
+            200 -> body.toBasicFlowResponse()
+            else -> throw OpenIdConnectException("Error while exchanging code for token", body.toErrorResponse())
         }
     }
 

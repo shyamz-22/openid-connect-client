@@ -6,6 +6,7 @@ import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
+import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
@@ -55,7 +56,7 @@ class ApplicationTest {
 
     @Test
     fun `can exchange code for token fluently`() {
-        stubForTokenResponseWithBasicAuth()
+        stubForTokenResponseWithBasicAuth(SUCCESSFUL_RESPONSE)
 
         val mockHttpServletRequest = MockHttpServletRequest(CLIENT_REDIRECT_URI,
                 mapOf("code" to arrayOf(AUTH_CODE_VALUE),

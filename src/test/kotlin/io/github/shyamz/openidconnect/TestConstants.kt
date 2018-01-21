@@ -23,8 +23,11 @@ object TestConstants {
 
 
     const val ID_TOKEN_VALUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+    const val NEW_ID_TOKEN_VALUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFsaWNlIEJvYiIsImFkbWluIjp0cnVlfQ.Mm1mIXXnuRCtrksgReUM28uMn2wmE0-xYzRfakWA4Cw"
     val ACCESS_TOKEN_VALUE = "SlAV32hkKG"
+    val NEW_ACCESS_TOKEN_VALUE = "TlAV78hkNG"
     val REFRESH_TOKEN_VALUE = "8xLOxBtZp8"
+    val NEW_REFRESH_TOKEN_VALUE = "9yM1y9uAq9"
 
     val SUCCESSFUL_RESPONSE = """
 {
@@ -33,6 +36,16 @@ object TestConstants {
   "refresh_token": "$REFRESH_TOKEN_VALUE",
   "expires_in": 3600,
   "id_token": "$ID_TOKEN_VALUE"
+}
+    """.trimIndent()
+
+    val SUCCESSFUL_REFRESH_RESPONSE = """
+{
+  "access_token": "$NEW_ACCESS_TOKEN_VALUE",
+  "token_type": "Bearer",
+  "refresh_token": "$NEW_REFRESH_TOKEN_VALUE",
+  "expires_in": 3600,
+  "id_token": "$NEW_ID_TOKEN_VALUE"
 }
     """.trimIndent()
 

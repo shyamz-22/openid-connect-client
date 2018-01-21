@@ -33,6 +33,23 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
         }
     }
 
+    fun refresh(refreshTokenGrant: RefreshTokenGrant): BasicFlowResponse {
+
+        val result = UnirestFactory().post(idProviderConfiguration.tokenEndpoint.toString())
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.mimeType)
+                .field("grant_type", refreshTokenGrant.grantType.grant)
+                .field("refresh_token", refreshTokenGrant.refreshToken)
+                .field("redirect_uri", openIdClient.redirectUri)
+                .addAuthentication()
+                .asObject(TokenResponse::class.java)
+
+        return when(result.status) {
+            200 -> result.body.toBasicFlowResponse()
+            else -> throw OpenIdConnectException("Error while exchanging code for token", result.body.toErrorResponse())
+        }
+    }
+
+
     private fun MultipartBody.addAuthentication(): MultipartBody {
         return when (authMethod) {
             Basic -> basicAuth(openIdClient.id, openIdClient.secret)
@@ -44,5 +61,4 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
         return this.field("client_id", id)
                 .field("client_secret", secret)
     }
-
 }

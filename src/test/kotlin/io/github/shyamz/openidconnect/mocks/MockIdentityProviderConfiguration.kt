@@ -11,7 +11,7 @@ class MockIdentityProviderConfiguration {
 
     companion object {
 
-        fun get(tokenEndpointAuthMethods: List<TokenEndPointAuthMethod> = emptyList()): IdProviderConfiguration {
+        fun get(): IdProviderConfiguration {
 
             return IdProviderConfiguration(issuer = URI.create("http://localhost:8089"),
                     authorizationEndpoint = URI.create("http://localhost:8089/authorize"),
@@ -19,8 +19,7 @@ class MockIdentityProviderConfiguration {
                     jwksEndpoint = URI.create("http://localhost:8089/keys"),
                     subjectTypes = listOf(SubjectType.Public),
                     responseTypes = listOf(ResponseType.Code),
-                    idTokenSigningAlgorithms = listOf(SigningAlgorithm.RS256),
-                    tokenEndpointAuthMethods = tokenEndpointAuthMethods)
+                    idTokenSigningAlgorithms = listOf(SigningAlgorithm.RS256))
         }
 
     }

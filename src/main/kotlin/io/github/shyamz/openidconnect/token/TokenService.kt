@@ -28,10 +28,14 @@ class TokenService(private val idProviderConfiguration: IdProviderConfiguration,
         return handleTokenEndpointResponse(result)
     }
 
-    fun refresh(refreshTokenGrant: RefreshTokenGrant): BasicFlowResponse {
+    fun refresh(refreshTokenGrant: RefreshTokenGrant, scope: Set<String> = emptySet()): BasicFlowResponse {
 
         val result = basicTokenEndpointRequest(refreshTokenGrant)
                 .field("refresh_token", refreshTokenGrant.refreshToken)
+                .apply {
+                    scope.takeIf { it.isNotEmpty() }
+                    ?.apply { field("scope", scope.joinToString(" "))}
+                }
                 .asTokenResponse()
 
         return handleTokenEndpointResponse(result)

@@ -3,11 +3,9 @@ package io.github.shyamz.openidconnect.token
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import io.github.shyamz.openidconnect.TestConstants
-import io.github.shyamz.openidconnect.TestConstants.ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
-import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.INVALID_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ID_TOKEN_VALUE
@@ -161,5 +159,31 @@ class TokenServiceTest {
                         "&grant_type=refresh_token" +
                         "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
                         "&refresh_token=8xLOxBtZp8")))
+    }
+
+    @Test
+    fun `refresh - can refresh tokens with additional scope params`() {
+        //GIVEN
+        stubForTokenResponseWithPostAuth(SUCCESSFUL_REFRESH_RESPONSE)
+        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+
+        //WHEN
+        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+                .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE), setOf("openid","email", "profile"))
+
+        //THEN
+        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
+        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
+        assertThat(basicFlowResponse.accessToken).isEqualTo(NEW_ACCESS_TOKEN_VALUE)
+        assertThat(basicFlowResponse.idToken).isEqualTo(NEW_ID_TOKEN_VALUE)
+        assertThat(basicFlowResponse.refreshToken).isEqualTo(NEW_REFRESH_TOKEN_VALUE)
+
+        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
+                equalTo("client_id=$CLIENT_ID" +
+                        "&client_secret=$CLIENT_SECRET" +
+                        "&grant_type=refresh_token" +
+                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
+                        "&refresh_token=8xLOxBtZp8"+
+                        "&scope=openid+email+profile")))
     }
 }

@@ -2,10 +2,11 @@ package io.github.shyamz.openidconnect.token
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit.WireMockRule
-import io.github.shyamz.openidconnect.TestConstants
+import io.github.shyamz.openidconnect.TestConstants.ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
+import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.INVALID_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ID_TOKEN_VALUE
@@ -22,6 +23,7 @@ import io.github.shyamz.openidconnect.mocks.MockIdentityProviderConfiguration
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBadRequest
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithPostAuth
+import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import io.github.shyamz.openidconnect.response.model.ErrorResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -46,16 +48,14 @@ class TokenServiceTest {
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
         //THEN
-        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
-        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
-        assertThat(basicFlowResponse.accessToken).isEqualTo(TestConstants.ACCESS_TOKEN_VALUE)
-        assertThat(basicFlowResponse.idToken).isEqualTo(TestConstants.ID_TOKEN_VALUE)
-        assertThat(basicFlowResponse.refreshToken).isEqualTo(TestConstants.REFRESH_TOKEN_VALUE)
+        assertBasicFlowResponse(basicFlowResponse,
+                expectedAccessToken = ACCESS_TOKEN_VALUE,
+                expectedIdToken = ID_TOKEN_VALUE,
+                expectedRefreshToken = REFRESH_TOKEN_VALUE)
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("code=SplxlOBeZQQYbYS6WxSbIA" +
-                        "&grant_type=authorization_code" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+        verifyTokenEndPointCalledWith("code=SplxlOBeZQQYbYS6WxSbIA" +
+                "&grant_type=authorization_code" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")
     }
 
     @Test
@@ -69,18 +69,16 @@ class TokenServiceTest {
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
         //THEN
-        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
-        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
-        assertThat(basicFlowResponse.accessToken).isEqualTo(TestConstants.ACCESS_TOKEN_VALUE)
-        assertThat(basicFlowResponse.idToken).isEqualTo(TestConstants.ID_TOKEN_VALUE)
-        assertThat(basicFlowResponse.refreshToken).isEqualTo(TestConstants.REFRESH_TOKEN_VALUE)
+        assertBasicFlowResponse(basicFlowResponse,
+                expectedAccessToken = ACCESS_TOKEN_VALUE,
+                expectedIdToken = ID_TOKEN_VALUE,
+                expectedRefreshToken = REFRESH_TOKEN_VALUE)
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("client_id=$CLIENT_ID" +
-                        "&client_secret=$CLIENT_SECRET" +
-                        "&code=SplxlOBeZQQYbYS6WxSbIA" +
-                        "&grant_type=authorization_code" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+        verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
+                "&client_secret=$CLIENT_SECRET" +
+                "&code=SplxlOBeZQQYbYS6WxSbIA" +
+                "&grant_type=authorization_code" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")
     }
 
 
@@ -105,12 +103,11 @@ class TokenServiceTest {
                                 "https://tools.ietf.org/html/rfc6749#section-5.2"))
 
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("client_id=$CLIENT_ID" +
-                        "&client_secret=$CLIENT_SECRET" +
-                        "&code=$INVALID_CODE_VALUE" +
-                        "&grant_type=authorization_code" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")))
+        verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
+                "&client_secret=$CLIENT_SECRET" +
+                "&code=$INVALID_CODE_VALUE" +
+                "&grant_type=authorization_code" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")
     }
 
     @Test
@@ -124,16 +121,14 @@ class TokenServiceTest {
                 .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE))
 
         //THEN
-        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
-        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
-        assertThat(basicFlowResponse.accessToken).isEqualTo(NEW_ACCESS_TOKEN_VALUE)
-        assertThat(basicFlowResponse.idToken).isEqualTo(NEW_ID_TOKEN_VALUE)
-        assertThat(basicFlowResponse.refreshToken).isEqualTo(NEW_REFRESH_TOKEN_VALUE)
+        assertBasicFlowResponse(basicFlowResponse,
+                expectedAccessToken = NEW_ACCESS_TOKEN_VALUE,
+                expectedIdToken = NEW_ID_TOKEN_VALUE,
+                expectedRefreshToken = NEW_REFRESH_TOKEN_VALUE)
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("grant_type=refresh_token" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
-                        "&refresh_token=8xLOxBtZp8")))
+        verifyTokenEndPointCalledWith("grant_type=refresh_token" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
+                "&refresh_token=8xLOxBtZp8")
     }
 
     @Test
@@ -147,18 +142,16 @@ class TokenServiceTest {
                 .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE))
 
         //THEN
-        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
-        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
-        assertThat(basicFlowResponse.accessToken).isEqualTo(NEW_ACCESS_TOKEN_VALUE)
-        assertThat(basicFlowResponse.idToken).isEqualTo(NEW_ID_TOKEN_VALUE)
-        assertThat(basicFlowResponse.refreshToken).isEqualTo(NEW_REFRESH_TOKEN_VALUE)
+        assertBasicFlowResponse(basicFlowResponse,
+                expectedAccessToken = NEW_ACCESS_TOKEN_VALUE,
+                expectedIdToken = NEW_ID_TOKEN_VALUE,
+                expectedRefreshToken = NEW_REFRESH_TOKEN_VALUE)
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("client_id=$CLIENT_ID" +
-                        "&client_secret=$CLIENT_SECRET" +
-                        "&grant_type=refresh_token" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
-                        "&refresh_token=8xLOxBtZp8")))
+        verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
+                "&client_secret=$CLIENT_SECRET" +
+                "&grant_type=refresh_token" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
+                "&refresh_token=8xLOxBtZp8")
     }
 
     @Test
@@ -169,21 +162,35 @@ class TokenServiceTest {
 
         //WHEN
         val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
-                .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE), setOf("openid","email", "profile"))
+                .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE), setOf("openid", "email", "profile"))
 
         //THEN
-        assertThat(basicFlowResponse.tokenType).isEqualTo("Bearer")
-        assertThat(basicFlowResponse.expiresIn).isEqualTo(3600)
-        assertThat(basicFlowResponse.accessToken).isEqualTo(NEW_ACCESS_TOKEN_VALUE)
-        assertThat(basicFlowResponse.idToken).isEqualTo(NEW_ID_TOKEN_VALUE)
-        assertThat(basicFlowResponse.refreshToken).isEqualTo(NEW_REFRESH_TOKEN_VALUE)
+        assertBasicFlowResponse(basicFlowResponse,
+                expectedAccessToken = NEW_ACCESS_TOKEN_VALUE,
+                expectedIdToken = NEW_ID_TOKEN_VALUE,
+                expectedRefreshToken = NEW_REFRESH_TOKEN_VALUE)
 
-        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(
-                equalTo("client_id=$CLIENT_ID" +
-                        "&client_secret=$CLIENT_SECRET" +
-                        "&grant_type=refresh_token" +
-                        "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
-                        "&refresh_token=8xLOxBtZp8"+
-                        "&scope=openid+email+profile")))
+        verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
+                "&client_secret=$CLIENT_SECRET" +
+                "&grant_type=refresh_token" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
+                "&refresh_token=8xLOxBtZp8" +
+                "&scope=openid+email+profile")
+    }
+
+    private fun verifyTokenEndPointCalledWith(requestBody: String) {
+        verify(postRequestedFor(urlPathMatching("/token")).withRequestBody(equalTo(requestBody)))
+    }
+
+    private fun assertBasicFlowResponse(actual: BasicFlowResponse,
+                                        expectedAccessToken: String,
+                                        expectedIdToken: String,
+                                        expectedRefreshToken: String) {
+
+        assertThat(actual.tokenType).isEqualTo("Bearer")
+        assertThat(actual.expiresIn).isEqualTo(3600)
+        assertThat(actual.accessToken).isEqualTo(expectedAccessToken)
+        assertThat(actual.idToken).isEqualTo(expectedIdToken)
+        assertThat(actual.refreshToken).isEqualTo(expectedRefreshToken)
     }
 }

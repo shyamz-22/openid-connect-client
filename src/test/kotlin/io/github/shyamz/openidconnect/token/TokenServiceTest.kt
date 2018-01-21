@@ -6,12 +6,14 @@ import io.github.shyamz.openidconnect.TestConstants.ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
+import io.github.shyamz.openidconnect.TestConstants.ERROR_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.INVALID_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_REFRESH_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
+import io.github.shyamz.openidconnect.TestConstants.REFRESH_ERROR_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.REFRESH_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_REFRESH_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
@@ -85,12 +87,12 @@ class TokenServiceTest {
     @Test
     fun `exchange - throws exception when something fails`() {
         //GIVEN
-        stubForTokenResponseWithBadRequest()
+        stubForTokenResponseWithBadRequest(ERROR_RESPONSE)
         val idProviderConfiguration = MockIdentityProviderConfiguration.get()
 
         //WHEN
         val basicFlowResponseWithError = assertThatThrownBy {
-            TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+            TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
                     .exchange(AuthorizationCodeGrant(INVALID_CODE_VALUE))
         }
 
@@ -103,9 +105,7 @@ class TokenServiceTest {
                                 "https://tools.ietf.org/html/rfc6749#section-5.2"))
 
 
-        verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
-                "&client_secret=$CLIENT_SECRET" +
-                "&code=$INVALID_CODE_VALUE" +
+        verifyTokenEndPointCalledWith("code=$INVALID_CODE_VALUE" +
                 "&grant_type=authorization_code" +
                 "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")
     }
@@ -176,6 +176,32 @@ class TokenServiceTest {
                 "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
                 "&refresh_token=8xLOxBtZp8" +
                 "&scope=openid+email+profile")
+    }
+
+    @Test
+    fun `refresh - throws exception when something fails`() {
+        //GIVEN
+        stubForTokenResponseWithBadRequest(REFRESH_ERROR_RESPONSE)
+        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+
+        //WHEN
+        val basicFlowResponseWithError = assertThatThrownBy {
+            TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
+                    .refresh(RefreshTokenGrant(ACCESS_TOKEN_VALUE))
+        }
+
+        //THEN
+        basicFlowResponseWithError
+                .isInstanceOf(OpenIdConnectException::class.java)
+                .hasFieldOrPropertyWithValue("errorResponse",
+                        ErrorResponse("invalid_grant",
+                                "Refresh token is invalid or expired",
+                                "https://tools.ietf.org/html/rfc6749#section-5.2"))
+
+
+        verifyTokenEndPointCalledWith("grant_type=refresh_token" +
+                "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback" +
+                "&refresh_token=$ACCESS_TOKEN_VALUE")
     }
 
     private fun verifyTokenEndPointCalledWith(requestBody: String) {

@@ -56,4 +56,12 @@ object TestConstants {
   "error_uri": "https://tools.ietf.org/html/rfc6749#section-5.2"
 }
     """.trimIndent()
+
+    val REFRESH_ERROR_RESPONSE = """
+{
+  "error": "invalid_grant",
+  "error_description": "Refresh token is invalid or expired",
+  "error_uri": "https://tools.ietf.org/html/rfc6749#section-5.2"
+}
+    """.trimIndent()
 }

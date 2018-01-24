@@ -61,7 +61,7 @@ check_for_unTracked_files() {
     if [ -n "$unTrackedFiles" ]
 	then
 		echo >&2 "$(format red "Found Untracked files(s):")"
-		echo >&2 "$(tput setaf 3)$unTrackedFiles$(tput sgr 0)"
+		echo >&2 "$(format yellow "$unTrackedFiles")"
 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
 		exit 1
 	fi
@@ -84,7 +84,7 @@ run_tests() {
 
 	if [ $? -ne 0 ]
 	then
-		echo "$(format red "Tests failed, Cannot push to $remote")" >&2
+		echo >&2 "$(format red "Tests failed, Cannot push to $remote")"
 	  exit 1
 	fi
 	echo "Running tests $(greenTick)"

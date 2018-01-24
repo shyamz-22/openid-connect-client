@@ -22,6 +22,10 @@ format() {
     echo "$Message"
 }
 
+greenTick() {
+    echo "$(format green "✔")"
+}
+
 check_for_wip_commit() {
 	while read local_ref local_sha remote_ref remote_sha
 	do
@@ -48,7 +52,7 @@ check_for_wip_commit() {
 			fi
 		fi
 	done
-	echo "Checking for WIP Commits $(format green "✔")"
+	echo "Checking for WIP Commits $(greenTick)"
 }
 
 check_for_unTracked_files() {
@@ -61,7 +65,7 @@ check_for_unTracked_files() {
 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
 		exit 1
 	fi
-	echo "Checking for un tracked files $(format green "✔")"
+	echo "Checking for un tracked files $(greenTick)"
 }
 
 pull() {
@@ -72,7 +76,7 @@ pull() {
 	  echo >&2 "$(format red "Rebase failure, Cannot push to $remote")"
 	  exit 1
 	fi
-	echo "Applying latest changes from $remote $(format green "✔")"
+	echo "Applying latest changes from $remote $(greenTick)"
 }
 
 run_tests() {
@@ -83,7 +87,7 @@ run_tests() {
 		echo "$(format red "Tests failed, Cannot push to $remote")" >&2
 	  exit 1
 	fi
-	echo "Running tests $(format green "✔")"
+	echo "Running tests $(greenTick)"
 }
 
 remote="$1"

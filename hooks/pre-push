@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+format() {
+    local color=$1
+    local text=$2
+
+    case ${color} in
+    red*)
+      Message="$(tput setaf 1)$text$(tput sgr 0)"
+      ;;
+    green*)
+      Message="$(tput setaf 2)$text(tput sgr 0)"
+      ;;
+    yellow)
+      Message="$(tput setaf 3)$text$(tput sgr 0)"
+      ;;
+    *)
+      Message=${text}
+      ;;
+    esac
+
+    echo "$Message"
+}
+
 check_for_wip_commit() {
 	while read local_ref local_sha remote_ref remote_sha
 	do
@@ -21,7 +43,7 @@ check_for_wip_commit() {
 			local commit=`git rev-list -n 1 --grep 'WIP' "$range"`
 			if [ -n "$commit" ]
 			then
-				echo >&2 "$(tput setaf 1)Found WIP commit in $local_ref, not pushing$(tput sgr 0)"
+				echo >&2 "$(format red "Found WIP commit in ${local_ref}, not pushing")"
 				exit 1
 			fi
 		fi
@@ -34,7 +56,7 @@ check_for_unTracked_files() {
 
     if [ -n "$unTrackedFiles" ]
 	then
-		echo >&2 "$(tput setaf 1)Found Untracked files(s):$(tput sgr 0)"
+		echo >&2 "$(format red "Found Untracked files(s):")"
 		echo >&2 "$(tput setaf 3)$unTrackedFiles$(tput sgr 0)"
 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
 		exit 1
@@ -47,7 +69,7 @@ pull() {
 
 	if [ $? -ne 0 ]
 	then
-	  echo "$(tput setaf 1)Rebase failure, Cannot push to $remote$(tput sgr 0)" >&2
+	  echo >&2 "$(format red "Rebase failure, Cannot push to $remote")"
 	  exit 1
 	fi
 	echo "Applying latest changes from $remote $(tput setaf 2)✔$(tput sgr 0)"
@@ -58,7 +80,7 @@ run_tests() {
 
 	if [ $? -ne 0 ]
 	then
-		echo "$(tput setaf 1)Tests failed, Cannot push to $remote$(tput sgr 0)" >&2
+		echo "$(format red "Tests failed, Cannot push to $remote")" >&2
 	  exit 1
 	fi
 	echo "Running tests $(tput setaf 2)✔$(tput sgr 0)"

@@ -12,5 +12,4 @@ enum class Prompt {
             else -> this.name.toLowerCase()
         }
     }
-
 }

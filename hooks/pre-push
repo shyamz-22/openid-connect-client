@@ -80,7 +80,7 @@ pull() {
 }
 
 run_tests() {
-	./gradlew clean build
+	./gradlew clean build shadowJar
 
 	if [ $? -ne 0 ]
 	then

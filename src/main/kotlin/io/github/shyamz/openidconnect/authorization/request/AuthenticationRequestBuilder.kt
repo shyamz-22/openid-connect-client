@@ -1,12 +1,11 @@
 package io.github.shyamz.openidconnect.authorization.request
 
-import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
+import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import org.apache.http.client.utils.URIBuilder
 
-class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProviderConfiguration,
-                                   private val client: OpenIdClient) {
+class AuthenticationRequestBuilder {
 
     private val authenticationRequestParams: MutableMap<String, String> = mutableMapOf()
 
@@ -77,9 +76,9 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
         authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow parameter")
         authenticationRequestParams["scope"] ?: authenticationRequestParams.put("scope", "openid")
 
-        val authorizeUrl = URIBuilder(idProviderConfiguration.authorizationEndpoint)
-                .addParameter("client_id", client.id)
-                .addParameter("redirect_uri", client.redirectUri)
+        val authorizeUrl = URIBuilder(ClientConfiguration.provider.authorizationEndpoint)
+                .addParameter("client_id", ClientConfiguration.client.id)
+                .addParameter("redirect_uri", ClientConfiguration.client.redirectUri)
                 .apply {
                     authenticationRequestParams.forEach {
                         this.addParameter(it.key, it.value)
@@ -100,9 +99,9 @@ class AuthenticationRequestBuilder(private val idProviderConfiguration: IdProvid
 
 }
 
-class OpenIdClient(val id: String,
-                   val redirectUri: String,
-                   val secret: String? = null)
+data class OpenIdClient(val id: String,
+                        val redirectUri: String,
+                        val secret: String? = null)
 
 enum class Display {
     Page,

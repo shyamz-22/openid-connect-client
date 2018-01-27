@@ -17,18 +17,18 @@ import io.github.shyamz.openidconnect.TestConstants.REFRESH_ERROR_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.REFRESH_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_REFRESH_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
+import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.mocks.MockIdentityProviderConfiguration
-import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBadRequest
-import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
-import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithPostAuth
+import io.github.shyamz.openidconnect.mocks.*
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import io.github.shyamz.openidconnect.response.model.ErrorResponse
+import javafx.geometry.Pos
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -39,14 +39,24 @@ class TokenServiceTest {
     @JvmField
     val wireMockRule = WireMockRule(8089)
 
+    private val mockIssuer = "http://localhost:8089"
+    private lateinit var subject: TokenService
+
+    @Before
+    fun setUp() {
+        stubForMockIdentityProvider()
+        subject = TokenService()
+    }
+
+
     @Test
     fun `exchange - can exchange tokens with basic authentication`() {
         //GIVEN
         stubForTokenResponseWithBasicAuth(SUCCESSFUL_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
-        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
+        val basicFlowResponse = subject
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
         //THEN
@@ -64,10 +74,10 @@ class TokenServiceTest {
     fun `exchange - can exchange tokens with post authentication`() {
         //GIVEN
         stubForTokenResponseWithPostAuth(SUCCESSFUL_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Post)
 
         //WHEN
-        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+        val basicFlowResponse = subject
                 .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
 
         //THEN
@@ -75,6 +85,7 @@ class TokenServiceTest {
                 expectedAccessToken = ACCESS_TOKEN_VALUE,
                 expectedIdToken = ID_TOKEN_VALUE,
                 expectedRefreshToken = REFRESH_TOKEN_VALUE)
+
 
         verifyTokenEndPointCalledWith("client_id=$CLIENT_ID" +
                 "&client_secret=$CLIENT_SECRET" +
@@ -88,11 +99,11 @@ class TokenServiceTest {
     fun `exchange - throws exception when something fails`() {
         //GIVEN
         stubForTokenResponseWithBadRequest(ERROR_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
         val basicFlowResponseWithError = assertThatThrownBy {
-            TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
+            TokenService()
                     .exchange(AuthorizationCodeGrant(INVALID_CODE_VALUE))
         }
 
@@ -114,10 +125,10 @@ class TokenServiceTest {
     fun `refresh - can refresh tokens with basic authentication`() {
         //GIVEN
         stubForTokenResponseWithBasicAuth(SUCCESSFUL_REFRESH_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
-        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
+        val basicFlowResponse = subject
                 .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE))
 
         //THEN
@@ -135,10 +146,9 @@ class TokenServiceTest {
     fun `refresh - can refresh tokens with post authentication`() {
         //GIVEN
         stubForTokenResponseWithPostAuth(SUCCESSFUL_REFRESH_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
-
+        loadClientConfiguration(mockIssuer, Post)
         //WHEN
-        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+        val basicFlowResponse = subject
                 .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE))
 
         //THEN
@@ -158,10 +168,10 @@ class TokenServiceTest {
     fun `refresh - can refresh tokens with additional scope params`() {
         //GIVEN
         stubForTokenResponseWithPostAuth(SUCCESSFUL_REFRESH_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Post)
 
         //WHEN
-        val basicFlowResponse = TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Post)
+        val basicFlowResponse = subject
                 .refresh(RefreshTokenGrant(REFRESH_TOKEN_VALUE), setOf("openid", "email", "profile"))
 
         //THEN
@@ -182,11 +192,11 @@ class TokenServiceTest {
     fun `refresh - throws exception when something fails`() {
         //GIVEN
         stubForTokenResponseWithBadRequest(REFRESH_ERROR_RESPONSE)
-        val idProviderConfiguration = MockIdentityProviderConfiguration.get()
+        loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
         val basicFlowResponseWithError = assertThatThrownBy {
-            TokenService(idProviderConfiguration, OPEN_ID_CLIENT, Basic)
+            subject
                     .refresh(RefreshTokenGrant(ACCESS_TOKEN_VALUE))
         }
 
@@ -219,4 +229,5 @@ class TokenServiceTest {
         assertThat(actual.idToken).isEqualTo(expectedIdToken)
         assertThat(actual.refreshToken).isEqualTo(expectedRefreshToken)
     }
+
 }

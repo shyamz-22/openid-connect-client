@@ -1,6 +1,12 @@
 package io.github.shyamz.openidconnect
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
+import io.github.shyamz.openidconnect.configuration.ClientConfiguration
+import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
+import io.github.shyamz.openidconnect.discovery.ProviderConfigurationModel
+import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import java.net.URI
 
 object TestConstants {
@@ -18,6 +24,8 @@ object TestConstants {
     val GOOGLE_ISSUER = URI.create("https://accounts.google.com/")
     val YAHOO_ISSUER = URI.create("https://api.login.yahoo.com")
     val PAYPAL_ISSUER = URI.create("https://www.paypal.com")
+
+    val GOOGLE_PROVIDER = WellKnownConfigDiscoverer(GOOGLE_ISSUER).identityProviderConfiguration()
 
     val OPEN_ID_CLIENT = OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
 
@@ -64,4 +72,25 @@ object TestConstants {
   "error_uri": "https://tools.ietf.org/html/rfc6749#section-5.2"
 }
     """.trimIndent()
+
+    fun expectedIdPConfiguration(provider: String): IdProviderConfiguration {
+        val resource = javaClass.getResource("/fixtures/$provider-openid-wellknown-config.json")
+        return jacksonObjectMapper().readValue(resource,
+                ProviderConfigurationModel::class.java).idProviderConfig()
+    }
+
+    fun mockIdPConfiguration(): String {
+        val resource = javaClass.getResource("/fixtures/mock-openid-wellknown-config.json")
+        return resource.readText()
+    }
+
+    fun loadClientConfiguration(issuer: String,
+                                tokenEndPointAuthMethod: TokenEndPointAuthMethod) = ClientConfiguration
+            .with()
+            .issuer(issuer)
+            .clientId(TestConstants.CLIENT_ID)
+            .clientSecret(TestConstants.CLIENT_SECRET)
+            .redirectUri(TestConstants.CLIENT_REDIRECT_URI)
+            .tokenEndPointAuthMethod(tokenEndPointAuthMethod)
+            .load()
 }

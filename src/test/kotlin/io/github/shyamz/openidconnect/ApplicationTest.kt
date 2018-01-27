@@ -5,21 +5,19 @@ import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
-import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
-import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
-import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
+import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
+import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.mocks.MockHttpServletRequest
 import io.github.shyamz.openidconnect.mocks.MockHttpServletResponse
-import io.github.shyamz.openidconnect.mocks.MockIdentityProviderConfiguration
+import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
 import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
 import io.github.shyamz.openidconnect.response.OpenIdConnectCallBackInterceptor
-import io.github.shyamz.openidconnect.token.TokenService
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.net.URI
 
 class ApplicationTest {
 
@@ -27,16 +25,20 @@ class ApplicationTest {
     @JvmField
     val wireMockRule = WireMockRule(8089)
 
+    @Before
+    fun setUp() {
+        stubForMockIdentityProvider()
+        loadClientConfiguration("http://localhost:8089", Basic)
+    }
+
     @Test
     fun `can build authentication request fluently`() {
 
-        val authorizeRequest = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-                .authorizeRequest(OpenIdClient("id", "http://redirect-uri"))
+        val authorizeRequest = AuthenticationRequestBuilder()
                 .basic()
                 .build()
 
-        assertThat(authorizeRequest.authorizeUrl).isNotNull()
+        assertThat(authorizeRequest.authorizeUrl).isEqualTo(AUTHORIZE_URL)
     }
 
     @Test
@@ -44,14 +46,12 @@ class ApplicationTest {
 
         val mockHttpServletResponse = MockHttpServletResponse()
 
-        WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-                .authorizeRequest(OpenIdClient("id", "http://redirect-uri"))
+        AuthenticationRequestBuilder()
                 .basic()
                 .build()
                 .redirect(mockHttpServletResponse)
 
-        assertThat(mockHttpServletResponse.isRedirectedTo(AUTHORIZE_URL)).isTrue()
+        mockHttpServletResponse.isRedirectedTo(AUTHORIZE_URL)
     }
 
     @Test
@@ -62,22 +62,15 @@ class ApplicationTest {
                 mapOf("code" to arrayOf(AUTH_CODE_VALUE),
                         "state" to arrayOf(CLIENT_STATE_VALUE)))
 
-
-        val tokenService = TokenService(MockIdentityProviderConfiguration.get(),
-                OPEN_ID_CLIENT,
-                TokenEndPointAuthMethod.Basic)
-
-
         val tokens = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
                 .extractAuthorizationCode(CLIENT_STATE_VALUE)
-                .withTokenService(tokenService)
                 .exchange()
 
         assertThat(tokens.idToken).isEqualTo(ID_TOKEN_VALUE)
     }
 
     companion object {
-        private val AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth?client_id=id&redirect_uri=http%3A%2F%2Fredirect-uri&response_type=code&scope=openid"
+        private val AUTHORIZE_URL = "http://localhost:8089/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback&response_type=code&scope=openid"
     }
 }
 

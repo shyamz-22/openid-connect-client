@@ -74,6 +74,8 @@ class OpenIdConnectCallBackInterceptorTest {
                         "IdP to equal locally cached {\"state\": \"$DIFFERENT_CLIENT_STATE_VALUE\"}")
     }
 
+
+
     @Test
     fun `extractAuthorizationCode - throws exception when code is empty`() {
 

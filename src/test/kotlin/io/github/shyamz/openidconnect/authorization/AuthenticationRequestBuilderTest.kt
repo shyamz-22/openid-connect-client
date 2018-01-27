@@ -1,30 +1,46 @@
 package io.github.shyamz.openidconnect.authorization
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NONCE_VALUE
-import io.github.shyamz.openidconnect.authorization.request.*
-import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
+import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
+import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
+import io.github.shyamz.openidconnect.authorization.request.AuthorizationRequest
+import io.github.shyamz.openidconnect.authorization.request.Display
+import io.github.shyamz.openidconnect.authorization.request.Prompt
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
 import org.assertj.core.api.AbstractUriAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.net.URI
 
 class AuthenticationRequestBuilderTest {
 
+    @JvmField
+    @Rule
+    val wireMockRule = WireMockRule(8089)
+
+    private lateinit var subject: AuthenticationRequestBuilder
+
+    @Before
+    fun setUp() {
+        stubForMockIdentityProvider()
+        loadClientConfiguration("http://localhost:8089", Basic)
+        subject = AuthenticationRequestBuilder()
+    }
+
     @Test
     fun `build - can build a basic flow authentication request with state parameter`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-        val authenticationRequest = AuthenticationRequestBuilder(
-                googleProviderConfig,
-                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+        val authenticationRequest = subject
                 .basic()
                 .state({ CLIENT_STATE_VALUE })
                 .build()
@@ -37,11 +53,7 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - can build a basic flow authentication request without state parameter`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-        val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+        val authenticationRequest = subject
                 .basic()
                 .build()
 
@@ -52,15 +64,8 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - throws Exception when no flow is chosen`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-
         assertThatThrownBy {
-            AuthenticationRequestBuilder(
-                    googleProviderConfig,
-                    OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
-                    .build()
+            subject.build()
         }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasFieldOrPropertyWithValue("message", "Please choose a flow parameter")
@@ -69,11 +74,7 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - can build a basic flow authentication request with many scopes`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-        val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+        val authenticationRequest = subject
                 .basic()
                 .scope(setOf("openid", "email", "profile"))
                 .build()
@@ -84,11 +85,7 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - can build a basic flow authentication request with prompts`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-        val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+        val authenticationRequest = subject
                 .basic()
                 .prompt(setOf(Prompt.SelectAccount, Prompt.Consent))
                 .build()
@@ -100,14 +97,8 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - throws Exception when more than one prompt is presented for 'none' prompt`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-
         assertThatThrownBy {
-            AuthenticationRequestBuilder(
-                    googleProviderConfig,
-                    OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+            subject
                     .basic()
                     .prompt(setOf(Prompt.None, Prompt.Login))
                     .build()
@@ -119,11 +110,7 @@ class AuthenticationRequestBuilderTest {
     @Test
     fun `build - can build a basic flow authentication request with optional parameters`() {
 
-        val googleProviderConfig = WellKnownConfigDiscoverer(URI.create("https://accounts.google.com/"))
-                .identityProviderConfiguration()
-
-        val authenticationRequest = AuthenticationRequestBuilder(googleProviderConfig,
-                OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI))
+        val authenticationRequest = subject
                 .basic()
                 .responseMode("query")
                 .nonce({ NONCE_VALUE })
@@ -149,9 +136,10 @@ class AuthenticationRequestBuilderTest {
     private fun authenticationRequestAssert(authenticationRequest: AuthorizationRequest,
                                             scopes: String = "openid"): AbstractUriAssert<*> {
         return assertThat(URI.create(authenticationRequest.authorizeUrl))
-                .hasHost("accounts.google.com")
-                .hasPath("/o/oauth2/v2/auth")
-                .hasScheme("https")
+                .hasHost("localhost")
+                .hasPort(8089)
+                .hasPath("/authorize")
+                .hasScheme("http")
                 .hasParameter("client_id", CLIENT_ID)
                 .hasParameter("redirect_uri", CLIENT_REDIRECT_URI)
                 .hasParameter("response_type", "code")

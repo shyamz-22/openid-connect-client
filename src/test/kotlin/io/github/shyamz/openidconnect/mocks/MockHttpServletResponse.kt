@@ -1,5 +1,6 @@
 package io.github.shyamz.openidconnect.mocks
 
+import org.assertj.core.api.Assertions.assertThat
 import java.io.PrintWriter
 import java.util.*
 import javax.servlet.ServletOutputStream
@@ -10,8 +11,8 @@ class MockHttpServletResponse : HttpServletResponse {
 
     private var location: String = ""
 
-    fun isRedirectedTo(expectedLocation: String): Boolean {
-        return location == expectedLocation
+    fun isRedirectedTo(expectedLocation: String) {
+        assertThat(location).isEqualTo(expectedLocation)
     }
 
     override fun sendRedirect(location: String?) {

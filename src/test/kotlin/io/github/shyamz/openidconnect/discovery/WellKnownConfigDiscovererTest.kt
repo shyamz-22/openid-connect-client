@@ -1,10 +1,9 @@
 package io.github.shyamz.openidconnect.discovery
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.shyamz.openidconnect.TestConstants.GOOGLE_ISSUER
 import io.github.shyamz.openidconnect.TestConstants.PAYPAL_ISSUER
 import io.github.shyamz.openidconnect.TestConstants.YAHOO_ISSUER
-import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
+import io.github.shyamz.openidconnect.TestConstants.expectedIdPConfiguration
 import io.github.shyamz.openidconnect.configuration.model.CodeChallengeMethod.*
 import io.github.shyamz.openidconnect.configuration.model.GrantType
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
@@ -108,11 +107,5 @@ internal class WellKnownConfigDiscovererTest {
                 "user_id")
         assertThat(paypal.codeChallengeMethods).containsExactlyInAnyOrder(RS256, ES256, S256)
         assertThat(paypal.grantTypes).containsExactlyInAnyOrder(*GrantType.values())
-    }
-
-    private fun expectedIdPConfiguration(provider: String): IdProviderConfiguration {
-        val resource = javaClass.getResource("/fixtures/$provider-openid-wellknown-config.json")
-        return jacksonObjectMapper().readValue(resource,
-                ProviderConfigurationModel::class.java).idProviderConfig()
     }
 }

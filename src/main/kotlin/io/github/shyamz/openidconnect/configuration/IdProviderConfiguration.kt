@@ -1,7 +1,5 @@
 package io.github.shyamz.openidconnect.configuration
 
-import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
-import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.model.*
 import java.net.URI
 
@@ -18,9 +16,4 @@ data class IdProviderConfiguration(val issuer: URI,
                                    val tokenEndpointAuthMethods: List<TokenEndPointAuthMethod> = emptyList(),
                                    val codeChallengeMethods: List<CodeChallengeMethod> = emptyList(),
                                    val userInfoEndPoint: URI? = null,
-                                   val revocationEndPoint: URI? = null) {
-
-    fun authorizeRequest(openIdClient: OpenIdClient): AuthenticationRequestBuilder {
-        return AuthenticationRequestBuilder(this, openIdClient)
-    }
-}
+                                   val revocationEndPoint: URI? = null)

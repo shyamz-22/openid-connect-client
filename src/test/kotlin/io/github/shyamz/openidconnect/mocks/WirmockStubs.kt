@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.github.shyamz.openidconnect.TestConstants
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
+import io.github.shyamz.openidconnect.TestConstants.expectedIdPConfiguration
+import io.github.shyamz.openidconnect.TestConstants.mockIdPConfiguration
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
 
@@ -37,4 +39,14 @@ fun stubForTokenResponseWithBadRequest(expectedErrorResponse: String) {
                             .withStatus(400)
                             .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.mimeType)
                             .withBody(expectedErrorResponse)))
+}
+
+fun stubForMockIdentityProvider() {
+
+    stubFor(get(urlPathMatching("/.well-known/openid-configuration"))
+            .willReturn(
+                    aResponse()
+                            .withStatus(200)
+                            .withBody(mockIdPConfiguration())))
+
 }

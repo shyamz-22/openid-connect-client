@@ -5,10 +5,11 @@ import com.mashape.unirest.request.body.MultipartBody
 import io.github.shyamz.openidconnect.UnirestFactory
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.*
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
+import io.github.shyamz.openidconnect.response.model.ErrorResponse
 import io.github.shyamz.openidconnect.response.model.Grant
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
@@ -42,10 +43,21 @@ internal class TokenService {
     }
 
     private fun MultipartBody.addAuthentication(): MultipartBody {
-        return when (ClientConfiguration.tokenEndPointAuthMethod) {
-            Basic -> basicAuth(ClientConfiguration.client.id, ClientConfiguration.client.secret)
-            Post -> postAuth(ClientConfiguration.client.id, ClientConfiguration.client.secret)
+
+        return validateAuthenticationMethod().let {
+            when (ClientConfiguration.tokenEndPointAuthMethod) {
+                Basic -> basicAuth(ClientConfiguration.client.id, ClientConfiguration.client.secret)
+                Post -> postAuth(ClientConfiguration.client.id, ClientConfiguration.client.secret)
+                None -> this
+            }
         }
+    }
+
+    private fun validateAuthenticationMethod() {
+        (ClientConfiguration.provider.tokenEndpointAuthMethods
+                .firstOrNull { it == ClientConfiguration.tokenEndPointAuthMethod }
+                ?: throw OpenIdConnectException("Token Authentication method '${ClientConfiguration.tokenEndPointAuthMethod}' is not supported by IdP. " +
+                "Please choose one of ${ClientConfiguration.provider.tokenEndpointAuthMethods} values"))
     }
 
     private fun HttpResponse<TokenResponse>.handleResponse(): BasicFlowResponse {

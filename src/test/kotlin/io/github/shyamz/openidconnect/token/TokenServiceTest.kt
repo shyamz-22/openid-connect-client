@@ -19,8 +19,8 @@ import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_REFRESH_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Post
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
+import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.*
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.*
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
@@ -119,6 +119,28 @@ class TokenServiceTest {
         verifyTokenEndPointCalledWith("code=$INVALID_CODE_VALUE" +
                 "&grant_type=authorization_code" +
                 "&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback")
+    }
+
+    @Test
+    fun `exchange - throws exception when authentication method is not supported`() {
+        //GIVEN
+        loadClientConfiguration(mockIssuer, None)
+
+        //WHEN
+        val basicFlowResponseWithError = assertThatThrownBy {
+            TokenService()
+                    .exchange(AuthorizationCodeGrant(AUTH_CODE_VALUE))
+        }
+
+        //THEN
+        basicFlowResponseWithError
+                .isInstanceOf(OpenIdConnectException::class.java)
+                .hasFieldOrPropertyWithValue("message",
+                                "Token Authentication method 'None' is not supported by IdP. " +
+                                        "Please choose one of [Post, Basic] values")
+
+
+        verify(0, postRequestedFor(urlPathMatching("/token")))
     }
 
     @Test

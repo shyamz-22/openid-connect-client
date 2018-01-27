@@ -85,12 +85,10 @@ object TestConstants {
     }
 
     fun loadClientConfiguration(issuer: String,
-                                tokenEndPointAuthMethod: TokenEndPointAuthMethod) = ClientConfiguration
-            .with()
-            .issuer(issuer)
-            .clientId(TestConstants.CLIENT_ID)
-            .clientSecret(TestConstants.CLIENT_SECRET)
-            .redirectUri(TestConstants.CLIENT_REDIRECT_URI)
-            .tokenEndPointAuthMethod(tokenEndPointAuthMethod)
-            .load()
+                                tokenEndPointAuthMethod: TokenEndPointAuthMethod) =
+            ClientConfiguration
+                    .with()
+                    .issuer(issuer)
+                    .client(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
+                    .tokenEndPointAuthMethod(tokenEndPointAuthMethod)
 }

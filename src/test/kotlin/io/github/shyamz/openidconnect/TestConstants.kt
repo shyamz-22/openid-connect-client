@@ -27,7 +27,7 @@ object TestConstants {
 
     val GOOGLE_PROVIDER = WellKnownConfigDiscoverer(GOOGLE_ISSUER).identityProviderConfiguration()
 
-    val OPEN_ID_CLIENT = OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
+    internal val OPEN_ID_CLIENT = OpenIdClient(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
 
 
     const val ID_TOKEN_VALUE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"

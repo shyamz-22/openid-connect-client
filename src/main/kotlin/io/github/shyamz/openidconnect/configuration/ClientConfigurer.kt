@@ -50,9 +50,9 @@ class ClientConfigurer {
 
 object ClientConfiguration {
 
-    lateinit var provider: IdProviderConfiguration
-    lateinit var client: OpenIdClient
-    lateinit var tokenEndPointAuthMethod: TokenEndPointAuthMethod
+    internal lateinit var provider: IdProviderConfiguration
+    internal lateinit var client: OpenIdClient
+    internal lateinit var tokenEndPointAuthMethod: TokenEndPointAuthMethod
 
     fun with(): ClientConfigurer {
         return ClientConfigurer()

@@ -99,7 +99,7 @@ class AuthenticationRequestBuilder {
 
 }
 
-data class OpenIdClient(val id: String,
+internal data class OpenIdClient(val id: String,
                         val redirectUri: String,
                         val secret: String? = null)
 

@@ -13,7 +13,7 @@ import io.github.shyamz.openidconnect.response.model.Grant
 import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
 
-class TokenService {
+internal class TokenService {
 
     fun exchange(authorizationCodeGrant: AuthorizationCodeGrant): BasicFlowResponse {
 

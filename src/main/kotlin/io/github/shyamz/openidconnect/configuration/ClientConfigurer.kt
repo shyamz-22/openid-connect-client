@@ -1,6 +1,5 @@
 package io.github.shyamz.openidconnect.configuration
 
-import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
 import java.net.URI

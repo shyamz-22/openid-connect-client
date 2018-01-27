@@ -1,5 +1,7 @@
 package io.github.shyamz.openidconnect.authorization.request
 
+import io.github.shyamz.openidconnect.configuration.model.Display
+import io.github.shyamz.openidconnect.configuration.model.Prompt
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
@@ -71,14 +73,19 @@ class AuthenticationRequestBuilder {
         return this
     }
 
+    fun overrideRedirectUri(redirectUri: String): AuthenticationRequestBuilder {
+        authenticationRequestParams["redirect_uri"] = redirectUri
+        return this
+    }
+
     fun build(): AuthorizationRequest {
 
         authenticationRequestParams["response_type"] ?: throw OpenIdConnectException("Please choose a flow parameter")
         authenticationRequestParams["scope"] ?: authenticationRequestParams.put("scope", "openid")
+        authenticationRequestParams["redirect_uri"] ?: authenticationRequestParams.put("redirect_uri", ClientConfiguration.client.redirectUri)
 
         val authorizeUrl = URIBuilder(ClientConfiguration.provider.authorizationEndpoint)
                 .addParameter("client_id", ClientConfiguration.client.id)
-                .addParameter("redirect_uri", ClientConfiguration.client.redirectUri)
                 .apply {
                     authenticationRequestParams.forEach {
                         this.addParameter(it.key, it.value)
@@ -96,35 +103,4 @@ class AuthenticationRequestBuilder {
 
         return this
     }
-
-}
-
-internal data class OpenIdClient(val id: String,
-                        val redirectUri: String,
-                        val secret: String? = null)
-
-enum class Display {
-    Page,
-    Popup,
-    Touch,
-    Wap;
-
-    fun actualValue(): String {
-        return this.name.toLowerCase()
-    }
-}
-
-enum class Prompt {
-    None,
-    Login,
-    Consent,
-    SelectAccount;
-
-    fun actualValue(): String {
-        return when (SelectAccount) {
-            this -> "select_account"
-            else -> this.name.toLowerCase()
-        }
-    }
-
 }

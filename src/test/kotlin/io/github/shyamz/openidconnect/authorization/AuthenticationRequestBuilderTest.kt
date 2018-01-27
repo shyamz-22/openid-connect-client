@@ -4,13 +4,14 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
+import io.github.shyamz.openidconnect.TestConstants.DIFFERENT_CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NONCE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationRequest
-import io.github.shyamz.openidconnect.authorization.request.Display
-import io.github.shyamz.openidconnect.authorization.request.Prompt
+import io.github.shyamz.openidconnect.configuration.model.Display
+import io.github.shyamz.openidconnect.configuration.model.Prompt
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
@@ -59,6 +60,20 @@ class AuthenticationRequestBuilderTest {
 
         authenticationRequestAssert(authenticationRequest)
                 .hasNoParameter("state")
+    }
+
+    @Test
+    fun `build - can build a basic flow authentication request overrides redirect uri`() {
+
+        val authenticationRequest = subject
+                .basic()
+                .overrideRedirectUri(DIFFERENT_CLIENT_REDIRECT_URI)
+                .build()
+
+        authenticationRequestAssert(
+                authenticationRequest,
+                redirectUri = DIFFERENT_CLIENT_REDIRECT_URI
+        ).hasNoParameter("redirect_uri", CLIENT_REDIRECT_URI)
     }
 
     @Test
@@ -134,14 +149,16 @@ class AuthenticationRequestBuilderTest {
     }
 
     private fun authenticationRequestAssert(authenticationRequest: AuthorizationRequest,
-                                            scopes: String = "openid"): AbstractUriAssert<*> {
+                                            scopes: String = "openid",
+                                            redirectUri: String = CLIENT_REDIRECT_URI): AbstractUriAssert<*> {
+
         return assertThat(URI.create(authenticationRequest.authorizeUrl))
                 .hasHost("localhost")
                 .hasPort(8089)
                 .hasPath("/authorize")
                 .hasScheme("http")
                 .hasParameter("client_id", CLIENT_ID)
-                .hasParameter("redirect_uri", CLIENT_REDIRECT_URI)
+                .hasParameter("redirect_uri", redirectUri)
                 .hasParameter("response_type", "code")
                 .hasParameter("scope", scopes)
     }

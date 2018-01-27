@@ -1,7 +1,7 @@
 package io.github.shyamz.openidconnect
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.shyamz.openidconnect.authorization.request.OpenIdClient
+import io.github.shyamz.openidconnect.configuration.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
@@ -12,6 +12,7 @@ import java.net.URI
 object TestConstants {
 
     const val CLIENT_REDIRECT_URI = "https://openidconnect.net/callback"
+    const val DIFFERENT_CLIENT_REDIRECT_URI = "https://different.openidconnect.net/callback"
     const val CLIENT_ID = "client-id"
     const val CLIENT_SECRET = "client-id-secret"
     const val CLIENT_STATE_VALUE = "randomState"

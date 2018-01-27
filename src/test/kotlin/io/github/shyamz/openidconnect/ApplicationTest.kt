@@ -49,7 +49,7 @@ class ApplicationTest {
         AuthenticationRequestBuilder()
                 .basic()
                 .build()
-                .redirect(mockHttpServletResponse)
+                .andRedirect(mockHttpServletResponse)
 
         mockHttpServletResponse.isRedirectedTo(AUTHORIZE_URL)
     }
@@ -70,7 +70,7 @@ class ApplicationTest {
     }
 
     companion object {
-        private val AUTHORIZE_URL = "http://localhost:8089/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback&response_type=code&scope=openid"
+        private val AUTHORIZE_URL = "http://localhost:8089/authorize?client_id=client-id&response_type=code&scope=openid&redirect_uri=https%3A%2F%2Fopenidconnect.net%2Fcallback"
     }
 }
 

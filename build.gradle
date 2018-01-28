@@ -38,21 +38,24 @@ ext.assertjCoreVersion = '3.9.0'
 ext.jacksonVersion = '2.9.3'
 ext.servletApiVersion = '4.0.0'
 ext.wireMockVersion = '2.14.0'
+ext.jwtLibVersion = '5.4'
 
 
 
 dependencies {
 
     compile group: "com.mashape.unirest", name: "unirest-java", version: "$uniRestVersion"
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.3'
-    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.3'
+    compile group: "com.fasterxml.jackson.core", name: "jackson-core", version: "$jacksonVersion"
+    compile group: "com.fasterxml.jackson.module", name: "jackson-module-kotlin", version: "$jacksonVersion"
+    compile group: "com.nimbusds", name: "nimbus-jose-jwt", version: "$jwtLibVersion"
+
 
     compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "$servletApiVersion"
     testCompile group: "javax.servlet", name: "javax.servlet-api", version: "$servletApiVersion"
 
     testCompile group: "org.assertj", name: "assertj-core", version: "$assertjCoreVersion"
     testCompile group: "com.github.tomakehurst", name: "wiremock", version: "$wireMockVersion"
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    testCompile group: "org.mockito", name: "mockito-all", version: "1.10.19"
     testCompile group: "junit", name: "junit", version: "4.12"
 
 }

@@ -20,6 +20,9 @@ class ClientConfigurer {
         ClientConfiguration.tokenEndPointAuthMethod = authenticationMethod
         return this
     }
+
+    // set clock skew
+    // max age
 }
 
 object ClientConfiguration {

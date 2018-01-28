@@ -1,6 +1,7 @@
 package io.github.shyamz.openidconnect.mocks
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.nimbusds.jose.jwk.JWKSet
 import io.github.shyamz.openidconnect.TestConstants
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
@@ -39,6 +40,19 @@ fun stubForTokenResponseWithBadRequest(expectedErrorResponse: String) {
                             .withStatus(400)
                             .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.mimeType)
                             .withBody(expectedErrorResponse)))
+}
+
+fun stubForKeysEndpoint(jwkSet: JWKSet) {
+    stubFor(get(urlPathMatching("/keys"))
+            .willReturn(
+                    aResponse()
+                            .withStatus(200)
+                            .withBody(jwkSet
+                                    .toPublicJWKSet()
+                                    .toJSONObject()
+                                    .toJSONString())
+            )
+    )
 }
 
 fun stubForMockIdentityProvider() {

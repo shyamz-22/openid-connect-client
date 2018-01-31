@@ -17,7 +17,8 @@ import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.stubForKeysEndpoint
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,6 +49,12 @@ class JwtTokenWithECSignatureTest {
         createKeys()
         createJwkSet()
         stubForKeysEndpoint(jwKeySet)
+        SignatureVerifierFactory.cache.invalidateAll()
+    }
+
+    @After
+    fun tearDown() {
+        SignatureVerifierFactory.cache.invalidateAll()
     }
 
     @Test
@@ -71,7 +78,7 @@ class JwtTokenWithECSignatureTest {
     @Test
     fun `throws exception for an invalid jwt token`() {
 
-        Assertions.assertThatThrownBy { JwtToken("this.isa.junktoken").claims() }
+        assertThatThrownBy { JwtToken("this.isa.junktoken").claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("'this.isa.junktoken' is an invalid JWT token")
     }
@@ -80,7 +87,7 @@ class JwtTokenWithECSignatureTest {
     fun `throws exception for an invalid signature`() {
         val tokenWithDifferentKey = idTokenWithDifferentKey()
 
-        Assertions.assertThatThrownBy { JwtToken(tokenWithDifferentKey).claims() }
+        assertThatThrownBy { JwtToken(tokenWithDifferentKey).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Malicious Token. signature verification failed for token: \n'$tokenWithDifferentKey'")
     }
@@ -97,7 +104,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Expected issuer 'https://www.google.com' in id_token to match well known config issuer 'http://localhost:8089'")
     }
@@ -114,7 +121,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Expected audience '[another-client-id]' in id_token to contain client 'client-id'")
 
@@ -132,7 +139,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Expected id_token with multiple audiences '[client-id, another-client-id]' to have an 'azp' claim. But found none")
 
@@ -152,7 +159,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Expected azp 'another-client-id' in id_token to match client id 'client-id'")
 
@@ -171,7 +178,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessageContaining("id_token expired")
 
@@ -191,7 +198,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken, "another-nonce-value").claims() }
+        assertThatThrownBy { JwtToken(idToken, "another-nonce-value").claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessage("Expected nonce 'nonce-value' in id_token to match stored nonce 'another-nonce-value'")
 
@@ -211,7 +218,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessageContaining("id_token is issued at '$sixMinutesFromNow' is too far away from the current time")
 
@@ -232,7 +239,7 @@ class JwtTokenWithECSignatureTest {
                 .build()
                 .toIdToken()
 
-        Assertions.assertThatThrownBy { JwtToken(idToken).claims() }
+        assertThatThrownBy { JwtToken(idToken).claims() }
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasMessageContaining("User last authenticated was '6' minutes before. Re authenticate the user")
 
@@ -288,7 +295,5 @@ class JwtTokenWithECSignatureTest {
                 .build()
 
         jwKeySet = JWKSet(jwk)
-
-        println(jwKeySet.toPublicJWKSet().toJSONObject().toString())
     }
 }

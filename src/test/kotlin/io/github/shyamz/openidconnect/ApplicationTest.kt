@@ -9,9 +9,13 @@ import io.github.shyamz.openidconnect.TestConstants.tokenResponse
 import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.Basic
 import io.github.shyamz.openidconnect.mocks.*
+import io.github.shyamz.openidconnect.mocks.MockTokenKeysHelper.idToken
+import io.github.shyamz.openidconnect.mocks.MockTokenKeysHelper.jwkKeySet
 import io.github.shyamz.openidconnect.response.OpenIdConnectCallBackInterceptor
+import io.github.shyamz.openidconnect.validation.SignatureVerifierFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.entry
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,6 +30,12 @@ class ApplicationTest {
     fun setUp() {
         stubForMockIdentityProvider()
         loadClientConfiguration("http://localhost:8089", Basic)
+        SignatureVerifierFactory.cache.invalidateAll()
+    }
+
+    @After
+    fun tearDown() {
+        SignatureVerifierFactory.cache.invalidateAll()
     }
 
     @Test
@@ -53,8 +63,8 @@ class ApplicationTest {
 
     @Test
     fun `can exchange code for token fluently`() {
-        stubForKeysEndpoint(MockTokenKeysHelper.jwkKeySet)
-        stubForTokenResponseWithBasicAuth(tokenResponse(idToken = MockTokenKeysHelper.idToken))
+        stubForKeysEndpoint(jwkKeySet)
+        stubForTokenResponseWithBasicAuth(tokenResponse(idToken = idToken))
 
         val mockHttpServletRequest = MockHttpServletRequest(CLIENT_REDIRECT_URI,
                 mapOf("code" to arrayOf(AUTH_CODE_VALUE),

@@ -15,6 +15,7 @@ import io.github.shyamz.openidconnect.mocks.stubForKeysEndpoint
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,8 +45,13 @@ class JwtTokenWithRSASignatureTest {
         createJwkSet()
         stubForKeysEndpoint(jwKeySet)
         loadClientConfiguration("http://localhost:8089", TokenEndPointAuthMethod.Basic)
+        SignatureVerifierFactory.cache.invalidateAll()
     }
 
+    @After
+    fun tearDown() {
+        SignatureVerifierFactory.cache.invalidateAll()
+    }
 
     @Test
     fun `can validate a valid IdToken`() {

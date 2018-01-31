@@ -17,10 +17,29 @@ import java.util.*
 
 object MockTokenKeysHelper {
 
-    private val keyId = UUID.randomUUID().toString()
-    private val keyPair = createRsaKeys()
+    val keyId = UUID.randomUUID().toString()
+    val keyPair = createRsaKeys()
     val idToken = createIdToken(keyId, keyPair.private as RSAPrivateKey)
     val jwkKeySet = createJwkSet(keyId, keyPair.public as RSAPublicKey)
+
+    fun createIdToken(keyId: String, rsaPrivateKey: RSAPrivateKey, subject: String = "user-id"): String {
+
+        val claims = JWTClaimsSet.Builder()
+                .subject(subject)
+                .audience("client-id")
+                .issuer("http://localhost:8089")
+                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .issueTime(Date())
+                .build()
+
+        val jwsHeader = JWSHeader.Builder(JWSAlgorithm.RS256)
+                .keyID(keyId)
+                .build()
+
+        return SignedJWT(jwsHeader, claims).apply {
+            sign(RSASSASigner(rsaPrivateKey))
+        }.serialize()
+    }
 
     private fun createRsaKeys(): KeyPair {
         return KeyPairGenerator.getInstance("RSA").apply {
@@ -35,25 +54,6 @@ object MockTokenKeysHelper {
                 .build()) {
             JWKSet(this)
         }
-    }
-
-    private fun createIdToken(keyId: String, rsaPrivateKey: RSAPrivateKey): String {
-
-        val claims = JWTClaimsSet.Builder()
-                .subject("user-id")
-                .audience("client-id")
-                .issuer("http://localhost:8089")
-                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                .issueTime(Date())
-                .build()
-
-        val jwsHeader = JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(keyId)
-                .build()
-
-        return SignedJWT(jwsHeader, claims).apply {
-            sign(RSASSASigner(rsaPrivateKey))
-        }.serialize()
     }
 
 }

@@ -39,6 +39,7 @@ ext.jacksonVersion = '2.9.3'
 ext.servletApiVersion = '4.0.0'
 ext.wireMockVersion = '2.14.0'
 ext.jwtLibVersion = '5.4'
+ext.caffeineVersion = '2.6.1'
 
 
 
@@ -50,8 +51,11 @@ dependencies {
     compile group: "com.nimbusds", name: "nimbus-jose-jwt", version: "$jwtLibVersion"
 
 
+    compile "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
+
     compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "$servletApiVersion"
     testCompile group: "javax.servlet", name: "javax.servlet-api", version: "$servletApiVersion"
+
 
     testCompile group: "org.assertj", name: "assertj-core", version: "$assertjCoreVersion"
     testCompile group: "com.github.tomakehurst", name: "wiremock", version: "$wireMockVersion"

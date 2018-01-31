@@ -84,7 +84,7 @@ internal fun JWTClaimsSet.validateIssuer(): JWTClaimsSet {
 }
 
 internal fun SignedJWT.verifySignature(): JWTClaimsSet {
-    if (!verify(SignatureVerifierFactory().jwsVerifier(this.header))) {
+    if (!verify(SignatureVerifierFactory.jwsVerifier(this.header))) {
         throw OpenIdConnectException("Malicious Token. signature verification failed for token: \n'${this.serialize()}'")
     }
     return this.jwtClaimsSet

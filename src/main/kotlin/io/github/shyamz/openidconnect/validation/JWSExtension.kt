@@ -6,16 +6,17 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.util.DateUtils
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
+import io.github.shyamz.openidconnect.configuration.model.AlgorithmType
 import io.github.shyamz.openidconnect.configuration.model.SigningAlgorithm
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import java.time.Duration
 import java.time.Instant
 import java.util.*
 
-internal fun JWSHeader.signingAlgorithm(): SigningAlgorithm {
+internal fun JWSHeader.signingAlgorithm(): AlgorithmType {
     return ClientConfiguration.provider.idTokenSigningAlgorithms.firstOrNull {
         it.name == algorithm.name
-    } ?: throw OpenIdConnectException("Malicious Token. IdP does not support Algorithm '$algorithm'")
+    }?.algorithmType() ?: throw OpenIdConnectException("Malicious Token. IdP does not support Algorithm '$algorithm'")
 }
 
 internal fun JWTClaimsSet.validateTimeElapsedSinceLastAuthentication(): JWTClaimsSet {

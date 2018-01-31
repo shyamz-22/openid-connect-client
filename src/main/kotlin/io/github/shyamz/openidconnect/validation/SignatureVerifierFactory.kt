@@ -9,6 +9,8 @@ import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
+import io.github.shyamz.openidconnect.configuration.model.AlgorithmType
+import io.github.shyamz.openidconnect.configuration.model.AlgorithmType.*
 import io.github.shyamz.openidconnect.configuration.model.SigningAlgorithm.*
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 
@@ -17,13 +19,13 @@ internal class SignatureVerifierFactory {
     fun jwsVerifier(header: JWSHeader): JWSVerifier {
 
         return when (header.signingAlgorithm()) {
-            RS256 -> {
+            RSA -> {
                 RSASSAVerifier(getPublicKeys().getKeyByKeyId(header.keyID) as RSAKey)
             }
-            ES256 -> {
+            ECDSA -> {
                 ECDSAVerifier(getPublicKeys().getKeyByKeyId(header.keyID) as ECKey)
             }
-            HS256 -> {
+            HMAC -> {
                 MACVerifier(ClientConfiguration.client.secret)
             }
         }

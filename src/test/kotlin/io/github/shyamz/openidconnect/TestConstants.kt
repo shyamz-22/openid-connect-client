@@ -39,26 +39,6 @@ object TestConstants {
     val REFRESH_TOKEN_VALUE = "8xLOxBtZp8"
     val NEW_REFRESH_TOKEN_VALUE = "9yM1y9uAq9"
 
-    val SUCCESSFUL_RESPONSE = """
-{
-  "access_token": "$ACCESS_TOKEN_VALUE",
-  "token_type": "Bearer",
-  "refresh_token": "$REFRESH_TOKEN_VALUE",
-  "expires_in": 3600,
-  "id_token": "$ID_TOKEN_VALUE"
-}
-    """.trimIndent()
-
-    val SUCCESSFUL_REFRESH_RESPONSE = """
-{
-  "access_token": "$NEW_ACCESS_TOKEN_VALUE",
-  "token_type": "Bearer",
-  "refresh_token": "$NEW_REFRESH_TOKEN_VALUE",
-  "expires_in": 3600,
-  "id_token": "$NEW_ID_TOKEN_VALUE"
-}
-    """.trimIndent()
-
     val ERROR_RESPONSE = """
 {
   "error": "invalid_grant",
@@ -93,4 +73,19 @@ object TestConstants {
                     .issuer(issuer)
                     .client(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
                     .tokenEndPointAuthMethod(tokenEndPointAuthMethod)
+
+
+    fun tokenResponse(idToken: String = ID_TOKEN_VALUE,
+                      accessToken: String = ACCESS_TOKEN_VALUE,
+                      refreshToken: String = REFRESH_TOKEN_VALUE): String {
+        return """
+    {
+      "access_token": "$accessToken",
+      "token_type": "Bearer",
+      "refresh_token": "$refreshToken",
+      "expires_in": 3600,
+      "id_token": "$idToken"
+    }
+        """.trimIndent()
+    }
 }

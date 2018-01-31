@@ -12,20 +12,16 @@ import io.github.shyamz.openidconnect.TestConstants.INVALID_CODE_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ACCESS_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_ID_TOKEN_VALUE
 import io.github.shyamz.openidconnect.TestConstants.NEW_REFRESH_TOKEN_VALUE
-import io.github.shyamz.openidconnect.TestConstants.OPEN_ID_CLIENT
 import io.github.shyamz.openidconnect.TestConstants.REFRESH_ERROR_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.REFRESH_TOKEN_VALUE
-import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_REFRESH_RESPONSE
-import io.github.shyamz.openidconnect.TestConstants.SUCCESSFUL_RESPONSE
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
+import io.github.shyamz.openidconnect.TestConstants.tokenResponse
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.*
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.*
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import io.github.shyamz.openidconnect.response.model.ErrorResponse
-import javafx.geometry.Pos
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Before
@@ -52,7 +48,7 @@ class TokenServiceTest {
     @Test
     fun `exchange - can exchange tokens with basic authentication`() {
         //GIVEN
-        stubForTokenResponseWithBasicAuth(SUCCESSFUL_RESPONSE)
+        stubForTokenResponseWithBasicAuth(tokenResponse())
         loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
@@ -73,7 +69,7 @@ class TokenServiceTest {
     @Test
     fun `exchange - can exchange tokens with post authentication`() {
         //GIVEN
-        stubForTokenResponseWithPostAuth(SUCCESSFUL_RESPONSE)
+        stubForTokenResponseWithPostAuth(tokenResponse())
         loadClientConfiguration(mockIssuer, Post)
 
         //WHEN
@@ -146,7 +142,11 @@ class TokenServiceTest {
     @Test
     fun `refresh - can refresh tokens with basic authentication`() {
         //GIVEN
-        stubForTokenResponseWithBasicAuth(SUCCESSFUL_REFRESH_RESPONSE)
+        stubForTokenResponseWithBasicAuth(tokenResponse(
+                NEW_ID_TOKEN_VALUE,
+                NEW_ACCESS_TOKEN_VALUE,
+                NEW_REFRESH_TOKEN_VALUE
+        ))
         loadClientConfiguration(mockIssuer, Basic)
 
         //WHEN
@@ -167,7 +167,11 @@ class TokenServiceTest {
     @Test
     fun `refresh - can refresh tokens with post authentication`() {
         //GIVEN
-        stubForTokenResponseWithPostAuth(SUCCESSFUL_REFRESH_RESPONSE)
+        stubForTokenResponseWithPostAuth(tokenResponse(
+                NEW_ID_TOKEN_VALUE,
+                NEW_ACCESS_TOKEN_VALUE,
+                NEW_REFRESH_TOKEN_VALUE
+        ))
         loadClientConfiguration(mockIssuer, Post)
         //WHEN
         val basicFlowResponse = subject
@@ -189,7 +193,11 @@ class TokenServiceTest {
     @Test
     fun `refresh - can refresh tokens with additional scope params`() {
         //GIVEN
-        stubForTokenResponseWithPostAuth(SUCCESSFUL_REFRESH_RESPONSE)
+        stubForTokenResponseWithPostAuth(tokenResponse(
+                NEW_ID_TOKEN_VALUE,
+                NEW_ACCESS_TOKEN_VALUE,
+                NEW_REFRESH_TOKEN_VALUE
+        ))
         loadClientConfiguration(mockIssuer, Post)
 
         //WHEN

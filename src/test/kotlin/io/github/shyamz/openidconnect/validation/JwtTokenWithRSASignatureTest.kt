@@ -261,8 +261,6 @@ class JwtTokenWithRSASignatureTest {
                 .build()
 
         jwKeySet = JWKSet(jwk)
-
-        println(jwKeySet.toPublicJWKSet().toJSONObject().toString())
     }
 
     private fun idTokenWithDifferentKey(): String {

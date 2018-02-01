@@ -4,27 +4,21 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.MACSigner
-import com.nimbusds.jose.crypto.RSASSASigner
-import com.nimbusds.jose.jwk.JWKSet
-import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_SECRET
 import io.github.shyamz.openidconnect.TestConstants.DIFFERENT_CLIENT_SECRET
+import io.github.shyamz.openidconnect.TestConstants.USER_ID
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
-import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.mocks.stubForKeysEndpoint
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.security.KeyPairGenerator
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -56,8 +50,8 @@ class JwtTokenWithHMACSignatureTest {
 
         val claims = JwtToken(idToken).claims()
 
-        assertThat(claims).isNotEmpty
-        assertThat(claims["sub"]).isEqualTo("user-id")
+        assertThat(claims.claims).isNotEmpty
+        assertThat(claims.claims).contains(Assertions.entry("sub", USER_ID))
     }
 
     @Test

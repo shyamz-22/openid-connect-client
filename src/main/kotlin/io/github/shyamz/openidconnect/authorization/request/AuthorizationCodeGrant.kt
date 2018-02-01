@@ -15,7 +15,7 @@ data class AuthorizationCodeGrant(val code: String) : Grant(GrantType.Authorizat
         }
     }
 
-    fun exchange(): BasicFlowResponse {
+    fun exchangeCodeForTokens(): BasicFlowResponse {
         return TokenService().exchange(this)
     }
 }

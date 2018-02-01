@@ -19,14 +19,18 @@ import io.github.shyamz.openidconnect.TestConstants.tokenResponse
 import io.github.shyamz.openidconnect.authorization.request.AuthorizationCodeGrant
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod.*
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.mocks.*
+import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
+import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBadRequest
+import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithBasicAuth
+import io.github.shyamz.openidconnect.mocks.stubForTokenResponseWithPostAuth
 import io.github.shyamz.openidconnect.response.model.BasicFlowResponse
 import io.github.shyamz.openidconnect.response.model.ErrorResponse
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.Duration
+import java.util.*
 
 
 class TokenServiceTest {
@@ -132,8 +136,8 @@ class TokenServiceTest {
         basicFlowResponseWithError
                 .isInstanceOf(OpenIdConnectException::class.java)
                 .hasFieldOrPropertyWithValue("message",
-                                "Token Authentication method 'None' is not supported by IdP. " +
-                                        "Please choose one of [Post, Basic] values")
+                        "Token Authentication method 'None' is not supported by IdP. " +
+                                "Please choose one of [Post, Basic] values")
 
 
         verify(0, postRequestedFor(urlPathMatching("/token")))
@@ -254,7 +258,8 @@ class TokenServiceTest {
                                         expectedRefreshToken: String) {
 
         assertThat(actual.tokenType).isEqualTo("Bearer")
-        assertThat(actual.expiresIn).isEqualTo(3600)
+        assertThat(Duration.between(Date().toInstant(), actual.expiresAt!!.toInstant()).seconds)
+                .isCloseTo(3600, within(1L))
         assertThat(actual.accessToken).isEqualTo(expectedAccessToken)
         assertThat(actual.idToken).isEqualTo(expectedIdToken)
         assertThat(actual.refreshToken).isEqualTo(expectedRefreshToken)

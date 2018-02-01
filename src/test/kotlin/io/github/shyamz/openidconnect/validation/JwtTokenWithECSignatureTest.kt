@@ -11,6 +11,7 @@ import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import io.github.shyamz.openidconnect.TestConstants.USER_ID
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
@@ -71,8 +72,8 @@ class JwtTokenWithECSignatureTest {
 
         val claims = JwtToken(idToken).claims()
 
-        assertThat(claims).isNotEmpty
-        assertThat(claims["sub"]).isEqualTo("user-id")
+        assertThat(claims.claims).isNotEmpty
+        assertThat(claims.claims).contains(entry("sub", USER_ID))
     }
 
     @Test

@@ -21,6 +21,7 @@ object TestConstants {
     const val NONCE_VALUE = "aVeryRandomValue"
     const val AUTH_CODE_VALUE = "SplxlOBeZQQYbYS6WxSbIA"
     const val INVALID_CODE_VALUE = "somerandommeaninglesstextforIdp"
+    const val USER_ID = "user-id"
     const val BLANK = "                           "
 
     val GOOGLE_ISSUER = URI.create("https://accounts.google.com/")

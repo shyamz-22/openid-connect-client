@@ -2,8 +2,10 @@ package io.github.shyamz.openidconnect
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import io.github.shyamz.openidconnect.TestConstants.AUTH_CODE_VALUE
+import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_REDIRECT_URI
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_STATE_VALUE
+import io.github.shyamz.openidconnect.TestConstants.USER_ID
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.TestConstants.tokenResponse
 import io.github.shyamz.openidconnect.authorization.request.AuthenticationRequestBuilder
@@ -12,9 +14,11 @@ import io.github.shyamz.openidconnect.mocks.*
 import io.github.shyamz.openidconnect.mocks.MockTokenKeysHelper.idToken
 import io.github.shyamz.openidconnect.mocks.MockTokenKeysHelper.jwkKeySet
 import io.github.shyamz.openidconnect.response.OpenIdConnectCallBackInterceptor
+import io.github.shyamz.openidconnect.response.model.ClientInfo
+import io.github.shyamz.openidconnect.response.model.Profile
+import io.github.shyamz.openidconnect.response.model.UserInfo
 import io.github.shyamz.openidconnect.validation.SignatureVerifierFactory
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.entry
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -72,15 +76,13 @@ class ApplicationTest {
 
         val user = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
                 .extractAuthorizationCode(CLIENT_STATE_VALUE)
-                .exchange()
-                .authenticatedUser()
+                .exchangeCodeForTokens()
+                .extractAuthenticatedUserInfo()
 
-        assertThat(user.basicFlowResponse).isNotNull()
-        assertThat(user.claims).isNotEmpty
-        assertThat(user.claims).contains(
-                entry("sub", "user-id"),
-                entry("aud", listOf("client-id"))
-        )
+        assertThat(user.tokens).isNotNull()
+        assertThat(user.clientInfo).isEqualTo(ClientInfo(CLIENT_ID))
+        assertThat(user.userInfo).isEqualTo(UserInfo(Profile(USER_ID)))
+
     }
 
     companion object {

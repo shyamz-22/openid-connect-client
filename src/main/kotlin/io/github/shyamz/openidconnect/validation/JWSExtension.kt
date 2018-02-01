@@ -1,14 +1,15 @@
 package io.github.shyamz.openidconnect.validation
 
 import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.JWSObject
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.util.DateUtils
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.AlgorithmType
-import io.github.shyamz.openidconnect.configuration.model.SigningAlgorithm
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
+import io.github.shyamz.openidconnect.response.model.ClientInfo
+import io.github.shyamz.openidconnect.response.model.Profile
+import io.github.shyamz.openidconnect.response.model.UserInfo
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -89,3 +90,15 @@ internal fun SignedJWT.verifySignature(): JWTClaimsSet {
     }
     return this.jwtClaimsSet
 }
+
+internal fun JWTClaimsSet.clientInfo(): ClientInfo {
+    return audience
+            .takeIf { it.size > 1 }
+            ?.let {
+                ClientInfo(authorizedParty(), audience.filterNot { it == authorizedParty() })
+            } ?: ClientInfo(audience.first())
+}
+
+internal fun JWTClaimsSet.authorizedParty() = getStringClaim("azp")
+
+internal fun JWTClaimsSet.userInfo() = UserInfo(Profile(subject))

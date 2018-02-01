@@ -1,6 +1,8 @@
 package io.github.shyamz.openidconnect.response.model
 
 import io.github.shyamz.openidconnect.validation.JwtToken
+import io.github.shyamz.openidconnect.validation.clientInfo
+import io.github.shyamz.openidconnect.validation.userInfo
 import java.util.*
 
 data class BasicFlowResponse(val tokenType: String,
@@ -11,16 +13,6 @@ data class BasicFlowResponse(val tokenType: String,
 
     fun extractAuthenticatedUserInfo(nonce: String? = null): AuthenticatedUser {
         val claims = JwtToken(idToken, nonce).claims()
-        val clientInfo = if (claims.audience.size == 1)
-            ClientInfo(claims.audience.first())
-        else {
-            val authorizedClient = claims.getStringClaim("azp")
-            val interestedClient = claims.audience.filterNot { it == authorizedClient }
-            ClientInfo(authorizedClient, interestedClient)
-        }
-
-        val userInfo = UserInfo(Profile(claims.subject))
-
-        return AuthenticatedUser(this, clientInfo, userInfo)
+        return AuthenticatedUser(this, claims.clientInfo(), claims.userInfo())
     }
 }

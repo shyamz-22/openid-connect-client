@@ -9,12 +9,16 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.github.shyamz.openidconnect.TestConstants
+import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.USER_ID
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.stubForKeysEndpoint
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
+import io.github.shyamz.openidconnect.response.model.ClientInfo
+import io.github.shyamz.openidconnect.response.model.Profile
+import io.github.shyamz.openidconnect.response.model.UserInfo
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -71,7 +75,29 @@ class JwtTokenWithRSASignatureTest {
         val claims = JwtToken(idToken).claims()
 
         assertThat(claims.claims).isNotEmpty
-        assertThat(claims.claims).contains(Assertions.entry("sub", USER_ID))
+        assertThat(claims.clientInfo()).isEqualTo(ClientInfo(CLIENT_ID))
+        assertThat(claims.userInfo()).isEqualTo(UserInfo(Profile(USER_ID)))
+    }
+
+    @Test
+    fun `can validate a valid IdToken with multiple audiences`() {
+
+        val idToken = JWTClaimsSet.Builder()
+                .subject("user-id")
+                .audience(listOf("client-id", "client-id-desktop", "client-id-TV"))
+                .issuer("http://localhost:8089")
+                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .issueTime(Date())
+                .claim("azp", "client-id")
+                .build()
+                .toIdToken()
+
+        val claims = JwtToken(idToken).claims()
+
+        assertThat(claims.claims).isNotEmpty
+        assertThat(claims.clientInfo()).isEqualTo(ClientInfo(CLIENT_ID, listOf("client-id-desktop", "client-id-TV")))
+        assertThat(claims.userInfo()).isEqualTo(UserInfo(Profile(USER_ID)))
+        assertThat(claims.authorizedParty()).isEqualTo(CLIENT_ID)
     }
 
     @Test

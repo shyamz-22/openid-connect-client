@@ -75,7 +75,7 @@ class ApplicationTest {
                         "state" to arrayOf(CLIENT_STATE_VALUE)))
 
         val user = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                .extractAuthorizationCode(CLIENT_STATE_VALUE)
+                .extractCode(CLIENT_STATE_VALUE)
                 .exchangeCodeForTokens()
                 .extractAuthenticatedUserInfo()
 

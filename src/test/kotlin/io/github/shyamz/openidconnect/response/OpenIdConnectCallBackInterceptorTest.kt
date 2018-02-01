@@ -27,7 +27,7 @@ class OpenIdConnectCallBackInterceptorTest {
 
         //WHEN
         val basicFlowResponse = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                .extractAuthorizationCode(CLIENT_STATE_VALUE)
+                .extractCode(CLIENT_STATE_VALUE)
 
         //THEN
         assertThat(basicFlowResponse).isNotNull()
@@ -48,7 +48,7 @@ class OpenIdConnectCallBackInterceptorTest {
 
         //WHEN
         val basicFlowResponse = OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                .extractAuthorizationCode()
+                .extractCode()
 
         //THEN
         assertThat(basicFlowResponse).isNotNull()
@@ -64,7 +64,7 @@ class OpenIdConnectCallBackInterceptorTest {
         //WHEN
         val resultWithException = assertThatThrownBy {
             OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                    .extractAuthorizationCode(DIFFERENT_CLIENT_STATE_VALUE)
+                    .extractCode(DIFFERENT_CLIENT_STATE_VALUE)
         }
 
         //THEN
@@ -91,7 +91,7 @@ class OpenIdConnectCallBackInterceptorTest {
         //WHEN
         val resultWithException = assertThatThrownBy {
             OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                    .extractAuthorizationCode(CLIENT_STATE_VALUE)
+                    .extractCode(CLIENT_STATE_VALUE)
         }
 
         //THEN
@@ -117,7 +117,7 @@ class OpenIdConnectCallBackInterceptorTest {
         //WHEN
         val resultWithException = assertThatThrownBy {
             OpenIdConnectCallBackInterceptor(mockHttpServletRequest)
-                    .extractAuthorizationCode(CLIENT_STATE_VALUE)
+                    .extractCode(CLIENT_STATE_VALUE)
         }
 
         //THEN

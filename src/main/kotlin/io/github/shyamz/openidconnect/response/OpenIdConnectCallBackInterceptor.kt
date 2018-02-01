@@ -15,7 +15,7 @@ class OpenIdConnectCallBackInterceptor(private val request: HttpServletRequest) 
      * @See: http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes
      */
 
-    fun extractAuthorizationCode(storedState: String? = null): AuthorizationCodeGrant {
+    fun extractCode(storedState: String? = null): AuthorizationCodeGrant {
         val authorizationCode = request.getParameter(ResponseType.Code.parameter)
         val state = request.getParameter("state")
 

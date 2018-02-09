@@ -80,7 +80,7 @@ pull() {
 }
 
 run_tests() {
-	./gradlew clean build shadowJar
+	./gradlew clean build publishToMavenLocal
 
 	if [ $? -ne 0 ]
 	then

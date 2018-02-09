@@ -4,9 +4,9 @@ OpenId Connect Client written in Kotlin.
 
 # OpenID in a nutshell
 
-<a href="securingApplications.pdf" target="_blank">OpenID Connect</a>
+A Gist of [OpenID Connect](securingApplications.pdf)
 
-This client is implemented with reference to <a href="https://openid.net/specs/openid-connect-basic-1_0.html" target="_blank">OpenID Connect Basic Client Implementer's Guide</a>
+This client is implemented with reference to [OpenID Connect Basic Client Implementer's Guide](https://openid.net/specs/openid-connect-basic-1_0.html)
 
 # OpenID connect Basic Flow
 
@@ -19,7 +19,7 @@ This client is implemented with reference to <a href="https://openid.net/specs/o
 
 - Step 1:  Load Client Configuration
 
-```java
+```kotlin
  ClientConfiguration.
                .with()
                .client("<your-client-id>",
@@ -31,7 +31,7 @@ This client is implemented with reference to <a href="https://openid.net/specs/o
 
 - Step 2: Make an Authentication Request
 
-```java
+```kotlin
 AuthenticationRequestBuilder()
                         .basic()
                         .build()
@@ -40,7 +40,7 @@ AuthenticationRequestBuilder()
 
 - Step 3: Exchange Code for access token and id token
 
-```java
+```kotlin
 val user = OpenIdConnectCallBackInterceptor(httpServletRequest)
                 .extractCode()
                 .exchangeCodeForTokens()
@@ -80,5 +80,6 @@ AuthenticatedUser user = new OpenIdConnectCallBackInterceptor(httpServletRequest
 ```
 
 # References
-1. <a href="https://openidconnect.net/" target="_blank">OpenID connect playground</a>
-2. <a href="https://jwt.io/" target="_blank">JWT</a>
+1. [OpenID Connect Specification](https://openid.net/specs/openid-connect-core-1_0.html)
+1. [OpenID connect playground](https://openidconnect.net/)
+2. [JWT](https://jwt.io/)

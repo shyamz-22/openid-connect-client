@@ -4,9 +4,9 @@ OpenId Connect Client written in Kotlin.
 
 # OpenID in a nutshell
 
-I have tried here my best to simplify [OpenID Connect](securingApplications.pdf)
+<a href="securingApplications.pdf" target="_blank">OpenID Connect</a>
 
-This client is implemented with reference to [OpenID Connect Basic Client Implementer's Guide](https://openid.net/specs/openid-connect-basic-1_0.html)
+This client is implemented with reference to <a href="https://openid.net/specs/openid-connect-basic-1_0.html" target="_blank">OpenID Connect Basic Client Implementer's Guide</a>
 
 # OpenID connect Basic Flow
 
@@ -78,3 +78,7 @@ AuthenticatedUser user = new OpenIdConnectCallBackInterceptor(httpServletRequest
                 .exchangeCodeForTokens()
                 .extractAuthenticatedUserInfo(null);
 ```
+
+# References
+1. <a href="https://openidconnect.net/" target="_blank">OpenID connect playground</a>
+2. <a href="https://jwt.io/" target="_blank">JWT</a>

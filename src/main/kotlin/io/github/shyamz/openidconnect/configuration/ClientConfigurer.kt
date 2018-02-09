@@ -38,7 +38,7 @@ object ClientConfiguration {
 
     internal lateinit var provider: IdProviderConfiguration
     internal lateinit var client: OpenIdClient
-    internal lateinit var tokenEndPointAuthMethod: TokenEndPointAuthMethod
+    internal var tokenEndPointAuthMethod: TokenEndPointAuthMethod = TokenEndPointAuthMethod.Basic
     internal var maxAgeSinceUserAuthenticated: Long = 300 // 5 minutes
     internal var clockSkewSeconds: Long = 60 // 1 minute
 

@@ -105,12 +105,11 @@ class AuthenticationRequestBuilder {
     }
 
     private fun addOpenIdScope(scopes: Set<String>): List<String> {
-        val finalScopes = scopes.toMutableList()
-
-        if (finalScopes.contains("openid").not()) {
-            finalScopes.add(0, "openid")
-        }
-
-        return finalScopes
+        return scopes.toMutableList()
+                .takeUnless { it.contains("openid") }
+                ?.apply {
+                    this.add(0, "openid")
+                    return this
+                } ?: scopes.toList()
     }
 }

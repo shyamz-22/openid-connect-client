@@ -17,7 +17,7 @@ class AuthenticationRequestBuilder {
     }
 
     fun scope(scopes: Set<String>): AuthenticationRequestBuilder {
-        authenticationRequestParams["scope"] = scopes.joinToString(" ")
+        authenticationRequestParams["scope"] = addOpenIdScope(scopes).joinToString(" ")
         return this
     }
 
@@ -102,5 +102,15 @@ class AuthenticationRequestBuilder {
             throw OpenIdConnectException("prompt 'none' cannot be provided with any other value")
 
         return this
+    }
+
+    private fun addOpenIdScope(scopes: Set<String>): List<String> {
+        val finalScopes = scopes.toMutableList()
+
+        if (finalScopes.contains("openid").not()) {
+            finalScopes.add(0, "openid")
+        }
+
+        return finalScopes
     }
 }

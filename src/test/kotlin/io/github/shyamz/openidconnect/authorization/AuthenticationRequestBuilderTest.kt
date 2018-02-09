@@ -98,6 +98,17 @@ class AuthenticationRequestBuilderTest {
     }
 
     @Test
+    fun `build - adds openid scope if one is not provided`() {
+
+        val authenticationRequest = subject
+                .basic()
+                .scope(setOf("email", "profile"))
+                .build()
+
+        authenticationRequestAssert(authenticationRequest, "openid email profile")
+    }
+
+    @Test
     fun `build - can build a basic flow authentication request with prompts`() {
 
         val authenticationRequest = subject

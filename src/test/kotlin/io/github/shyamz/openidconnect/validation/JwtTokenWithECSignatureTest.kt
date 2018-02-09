@@ -4,11 +4,9 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.ECDSASigner
-import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.Curve
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWKSet
-import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.github.shyamz.openidconnect.TestConstants.USER_ID
@@ -17,7 +15,6 @@ import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMetho
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import io.github.shyamz.openidconnect.mocks.stubForKeysEndpoint
 import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.junit.After
 import org.junit.Before
@@ -26,7 +23,6 @@ import org.junit.Test
 import java.security.KeyPairGenerator
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
-import java.security.interfaces.RSAPrivateKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*

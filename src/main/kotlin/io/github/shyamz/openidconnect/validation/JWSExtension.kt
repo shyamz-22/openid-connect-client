@@ -4,12 +4,35 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.util.DateUtils
+import io.github.shyamz.openidconnect.StandardClaims.address
+import io.github.shyamz.openidconnect.StandardClaims.birthdate
+import io.github.shyamz.openidconnect.StandardClaims.country
+import io.github.shyamz.openidconnect.StandardClaims.email
+import io.github.shyamz.openidconnect.StandardClaims.email_verified
+import io.github.shyamz.openidconnect.StandardClaims.family_name
+import io.github.shyamz.openidconnect.StandardClaims.formatted
+import io.github.shyamz.openidconnect.StandardClaims.gender
+import io.github.shyamz.openidconnect.StandardClaims.given_name
+import io.github.shyamz.openidconnect.StandardClaims.locale
+import io.github.shyamz.openidconnect.StandardClaims.locality
+import io.github.shyamz.openidconnect.StandardClaims.middle_name
+import io.github.shyamz.openidconnect.StandardClaims.name
+import io.github.shyamz.openidconnect.StandardClaims.nickname
+import io.github.shyamz.openidconnect.StandardClaims.phone_number
+import io.github.shyamz.openidconnect.StandardClaims.phone_number_verified
+import io.github.shyamz.openidconnect.StandardClaims.picture
+import io.github.shyamz.openidconnect.StandardClaims.postal_code
+import io.github.shyamz.openidconnect.StandardClaims.preferred_username
+import io.github.shyamz.openidconnect.StandardClaims.profile
+import io.github.shyamz.openidconnect.StandardClaims.region
+import io.github.shyamz.openidconnect.StandardClaims.street_address
+import io.github.shyamz.openidconnect.StandardClaims.updated_at
+import io.github.shyamz.openidconnect.StandardClaims.website
+import io.github.shyamz.openidconnect.StandardClaims.zoneinfo
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.AlgorithmType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
-import io.github.shyamz.openidconnect.response.model.ClientInfo
-import io.github.shyamz.openidconnect.response.model.Profile
-import io.github.shyamz.openidconnect.response.model.UserInfo
+import io.github.shyamz.openidconnect.response.model.*
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -24,7 +47,7 @@ internal fun JWTClaimsSet.validateTimeElapsedSinceLastAuthentication(): JWTClaim
 
     getDateClaim("auth_time")?.let {
         val elapsedTimeSinceLastAuthenticated = Duration.between(Instant.ofEpochMilli(it.time), Instant.now())
-        if (elapsedTimeSinceLastAuthenticated.abs().seconds > 300) {
+        if (elapsedTimeSinceLastAuthenticated.abs().seconds > ClientConfiguration.maxAgeSinceUserAuthenticated) {
             throw OpenIdConnectException("User last authenticated was '${elapsedTimeSinceLastAuthenticated.abs().toMinutes()}' minutes before. Re authenticate the user")
         }
     }
@@ -40,15 +63,15 @@ internal fun JWTClaimsSet.validateNonce(nonce: String? = null): JWTClaimsSet {
 }
 
 internal fun JWTClaimsSet.validateIssuedAt(): JWTClaimsSet {
-    val issuedDuration = Duration.between(Instant.ofEpochMilli(issueTime.time), Instant.now())
-    if (issuedDuration.abs().seconds > 120) {
+    val issuedDuration = Duration.between(Instant.now(), Instant.ofEpochMilli(issueTime.time))
+    if (issuedDuration.abs().seconds > ClientConfiguration.clockSkewSeconds) {
         throw OpenIdConnectException("id_token is issued at '$issueTime' is too far away from the current time '${Date()}'")
     }
     return this
 }
 
 internal fun JWTClaimsSet.validateTokenExpiry(): JWTClaimsSet {
-    if (DateUtils.isAfter(Date(), expirationTime, 60)) {
+    if (DateUtils.isAfter(Date(), expirationTime, ClientConfiguration.clockSkewSeconds)) {
         throw OpenIdConnectException("id_token expired. Token expiration time is '$expirationTime'")
     }
     return this
@@ -101,4 +124,51 @@ internal fun JWTClaimsSet.clientInfo(): ClientInfo {
 
 internal fun JWTClaimsSet.authorizedParty() = getStringClaim("azp")
 
-internal fun JWTClaimsSet.userInfo() = UserInfo(Profile(subject))
+internal fun JWTClaimsSet.userInfo(): UserInfo {
+
+    val profile = Profile(
+            userId = subject,
+            name = getStringClaim(name),
+            givenName = getStringClaim(given_name),
+            familyName = getStringClaim(family_name),
+            middleName = getStringClaim(middle_name),
+            nickname = getStringClaim(nickname),
+            preferredUsername = getStringClaim(preferred_username),
+            profile = getStringClaim(profile),
+            picture = getStringClaim(picture),
+            website = getStringClaim(website),
+            gender = getStringClaim(gender),
+            birthDate = getStringClaim(birthdate),
+            locale = getStringClaim(locale),
+            zoneInfo = getStringClaim(zoneinfo),
+            updatedAt = getLongClaim(updated_at)
+    )
+
+    val email = getStringClaim(email)
+            ?.takeUnless { it.isBlank() }
+            ?.let {
+                Email(email = it,
+                        emailVerified = getBooleanClaim(email_verified))
+            }
+
+    val phone = getStringClaim(phone_number)
+            ?.takeUnless { it.isBlank() }
+            ?.let {
+                PhoneNumber(phoneNumber = it,
+                        phoneNumberVerified = getBooleanClaim(phone_number_verified))
+            }
+
+    val address = getJSONObjectClaim(address)
+            ?.let {
+                Address(formatted = it.getAsString(formatted),
+                        streetAddress = it.getAsString(street_address),
+                        locality = it.getAsString(locality),
+                        region = it.getAsString(region),
+                        postalCode = it.getAsString(postal_code),
+                        country = it.getAsString(country)
+                )
+            }
+
+
+    return UserInfo(profile, email, phone, address)
+}

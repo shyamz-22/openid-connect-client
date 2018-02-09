@@ -26,13 +26,13 @@ data class Profile(val userId: String,
                    val birthDate: String? = null,
                    val zoneInfo: String? = null,
                    val locale: String? = null,
-                   val updatedAt: String? = null)
+                   val updatedAt: Long? = null)
 
 data class Address(val formatted: String? = null,
-                   val street_address: String? = null,
+                   val streetAddress: String? = null,
                    val locality: String? = null,
                    val region: String? = null,
-                   val postal_code: String? = null,
+                   val postalCode: String? = null,
                    val country: String? = null)
 
 data class Email(val email: String,

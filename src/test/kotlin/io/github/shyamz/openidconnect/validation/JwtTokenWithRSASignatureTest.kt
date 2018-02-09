@@ -8,7 +8,6 @@ import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import io.github.shyamz.openidconnect.TestConstants
 import io.github.shyamz.openidconnect.TestConstants.CLIENT_ID
 import io.github.shyamz.openidconnect.TestConstants.USER_ID
 import io.github.shyamz.openidconnect.TestConstants.loadClientConfiguration
@@ -19,7 +18,6 @@ import io.github.shyamz.openidconnect.mocks.stubForMockIdentityProvider
 import io.github.shyamz.openidconnect.response.model.ClientInfo
 import io.github.shyamz.openidconnect.response.model.Profile
 import io.github.shyamz.openidconnect.response.model.UserInfo
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.After

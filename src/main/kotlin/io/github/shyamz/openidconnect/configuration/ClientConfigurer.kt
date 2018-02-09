@@ -7,7 +7,7 @@ import java.net.URI
 class ClientConfigurer {
 
     fun issuer(issuerUrl: String): ClientConfigurer {
-        ClientConfiguration.provider =  WellKnownConfigDiscoverer(URI.create(issuerUrl)).identityProviderConfiguration()
+        ClientConfiguration.provider = WellKnownConfigDiscoverer(URI.create(issuerUrl)).identityProviderConfiguration()
         return this
     }
 
@@ -21,8 +21,17 @@ class ClientConfigurer {
         return this
     }
 
-    // set clock skew
-    // max age
+    fun maxAgeSinceUserAuthenticated(seconds: Long): ClientConfigurer {
+        ClientConfiguration.maxAgeSinceUserAuthenticated = seconds
+        return this
+    }
+
+    fun clockSkewSeconds(seconds: Long): ClientConfigurer {
+        ClientConfiguration.clockSkewSeconds = seconds
+        return this
+    }
+
+
 }
 
 object ClientConfiguration {
@@ -30,6 +39,8 @@ object ClientConfiguration {
     internal lateinit var provider: IdProviderConfiguration
     internal lateinit var client: OpenIdClient
     internal lateinit var tokenEndPointAuthMethod: TokenEndPointAuthMethod
+    internal var maxAgeSinceUserAuthenticated: Long = 300 // 5 minutes
+    internal var clockSkewSeconds: Long = 60 // 1 minute
 
     fun with(): ClientConfigurer {
         return ClientConfigurer()

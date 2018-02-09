@@ -4,7 +4,6 @@ import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.configuration.model.SigningAlgorithm
 import io.github.shyamz.openidconnect.configuration.model.SubjectType
-import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import java.net.URI
 
 class MockIdentityProviderConfiguration {

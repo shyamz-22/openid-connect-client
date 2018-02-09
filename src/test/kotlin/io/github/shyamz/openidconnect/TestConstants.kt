@@ -1,9 +1,9 @@
 package io.github.shyamz.openidconnect
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.shyamz.openidconnect.configuration.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.IdProviderConfiguration
+import io.github.shyamz.openidconnect.configuration.OpenIdClient
 import io.github.shyamz.openidconnect.configuration.model.TokenEndPointAuthMethod
 import io.github.shyamz.openidconnect.discovery.ProviderConfigurationModel
 import io.github.shyamz.openidconnect.discovery.WellKnownConfigDiscoverer
@@ -67,13 +67,18 @@ object TestConstants {
         return resource.readText()
     }
 
-    fun loadClientConfiguration(issuer: String,
-                                tokenEndPointAuthMethod: TokenEndPointAuthMethod) =
+    fun loadClientConfiguration(
+            issuer: String,
+            tokenEndPointAuthMethod: TokenEndPointAuthMethod,
+            maxAgeSinceLastAuthenticated: Long = 300,
+            clockSkew: Long = 60) =
             ClientConfiguration
                     .with()
                     .issuer(issuer)
                     .client(CLIENT_ID, CLIENT_REDIRECT_URI, CLIENT_SECRET)
                     .tokenEndPointAuthMethod(tokenEndPointAuthMethod)
+                    .maxAgeSinceUserAuthenticated(maxAgeSinceLastAuthenticated)
+                    .clockSkewSeconds(clockSkew)
 
 
     fun tokenResponse(idToken: String = ID_TOKEN_VALUE,

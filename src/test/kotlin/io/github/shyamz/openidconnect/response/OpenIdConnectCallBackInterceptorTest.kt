@@ -75,7 +75,6 @@ class OpenIdConnectCallBackInterceptorTest {
     }
 
 
-
     @Test
     fun `extractAuthorizationCode - throws exception when code is empty`() {
 

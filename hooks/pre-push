@@ -80,6 +80,8 @@ pull() {
 }
 
 run_tests() {
+  cd jvm
+
 	./gradlew clean build publishToMavenLocal
 
 	if [ $? -ne 0 ]
@@ -87,6 +89,7 @@ run_tests() {
 		echo >&2 "$(format red "Tests failed, Cannot push to $remote")"
 	  exit 1
 	fi
+  cd ..
 	echo "Running tests $(greenTick)"
 }
 

@@ -81,5 +81,5 @@ AuthenticatedUser user = new OpenIdConnectCallBackInterceptor(httpServletRequest
 
 # References
 1. [OpenID Connect Specification](https://openid.net/specs/openid-connect-core-1_0.html)
-1. [OpenID connect playground](https://openidconnect.net/)
-2. [JWT](https://jwt.io/)
+2. [OpenID connect playground](https://openidconnect.net/)
+3. [JWT](https://jwt.io/)

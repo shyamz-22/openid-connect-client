@@ -90,6 +90,16 @@ run_tests() {
 	  exit 1
 	fi
   cd ..
+  cd sampleapps/oidc-java-app/
+  CLIENT_ID="a" CLIENT_SECRET="b" ./gradlew clean build
+
+  if [ $? -ne 0 ]
+	then
+		echo >&2 "$(format red "Cannot build sample apps, Cannot push to $remote")"
+	  exit 1
+	fi
+
+  cd ../..
 	echo "Running tests $(greenTick)"
 }
 

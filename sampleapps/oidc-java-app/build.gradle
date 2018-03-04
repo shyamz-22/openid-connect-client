@@ -27,6 +27,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-freemarker')
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile('io.github.shyamz-22:openidconnect:0.0.1-SNAPSHOT')
+    compile('io.github.shyamz-22:oidc-jvm-client:+')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

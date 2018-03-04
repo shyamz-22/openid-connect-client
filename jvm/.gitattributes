@@ -1,1 +1,2 @@
 .gnupg/secring.gpg filter=git-crypt diff=git-crypt
+gradle.properties filter=git-crypt diff=git-crypt

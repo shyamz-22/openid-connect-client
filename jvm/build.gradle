@@ -5,7 +5,9 @@ def getVersionFromGit = { ->
             commandLine 'git', 'describe', '--tags', '--abbrev=0'
             standardOutput = stdout
         }
-        return stdout.toString().trim()
+        def version = stdout.toString().trim()
+        def nexusVersion = version.replaceAll("-rc.*", "-SNAPSHOT")
+        return nexusVersion
     }
     catch (e) {
         throw RuntimeException(e)

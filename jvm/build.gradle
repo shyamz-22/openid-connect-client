@@ -7,6 +7,10 @@ def getVersionFromGit = { ->
         }
         def version = stdout.toString().trim()
         def nexusVersion = version.replaceAll("-rc.*", "-SNAPSHOT")
+        if (nexusVersion.startsWith("v")) {
+          nexusVersion = nexusVersion.replaceAll("v", "")
+        }
+        println "The version is: "+ nexusVersion
         return nexusVersion
     }
     catch (e) {

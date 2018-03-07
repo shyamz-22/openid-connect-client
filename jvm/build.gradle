@@ -42,7 +42,7 @@ repositories {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.4'
+    gradleVersion = '4.6'
 }
 
 
@@ -51,7 +51,10 @@ dependencies {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions {
+       jvmTarget = "1.8"
+       freeCompilerArgs = ["-include-runtime"]
+   }
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"

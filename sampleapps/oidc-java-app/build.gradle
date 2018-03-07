@@ -33,3 +33,7 @@ dependencies {
     compile('io.github.shyamz-22:oidc-jvm-client:+')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+}

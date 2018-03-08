@@ -20,7 +20,7 @@ This client is implemented with reference to [OpenID Connect Basic Client Implem
 ### Gradle
 
 ```gradle
-compile 'io.github.shyamz-22:oidc-jvm-client:0.2.5'
+compile 'io.github.shyamz-22:oidc-jvm-client:$version'
 ```
 
 ### Maven
@@ -29,7 +29,7 @@ compile 'io.github.shyamz-22:oidc-jvm-client:0.2.5'
 <dependency>
     <groupId>io.github.shyamz-22</groupId>
     <artifactId>oidc-jvm-client</artifactId>
-    <version>0.2.5</version>
+    <version>${version}</version>
 </dependency>
 ```
 

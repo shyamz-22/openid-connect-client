@@ -1,0 +1,269 @@
+resources:
+- name: oidc-jvm-src
+  type: git
+  source:
+    uri: git@github.com:shyamz-22/openid-connect-client.git
+    branch: master
+    private_key: ((private_key))
+    git_crypt_key: ((gitcrypt_key))
+
+- name: oidc-jvm-version
+  type: semver
+  source:
+    driver: git
+    uri: git@github.com:shyamz-22/openid-connect-client.git
+    branch: version
+    file: version
+    private_key: ((private_key))
+    git_crypt_key: ((gitcrypt_key))
+    initial_version: 0.0.1
+
+- name: oidc-jvm-snapshot-src
+  type: git
+  source:
+    uri: git@github.com:shyamz-22/openid-connect-client.git
+    branch: master
+    tag_filter: "*-rc.*"
+    git_crypt_key: ((gitcrypt_key))
+    private_key: ((private_key))
+    paths:
+      - jvm
+
+- name: oidc-jvm-release-src
+  type: git
+  source:
+    uri: git@github.com:shyamz-22/openid-connect-client.git
+    branch: master
+    tag_filter: v*
+    private_key: ((private_key))
+    git_crypt_key: ((gitcrypt_key))
+    paths:
+      - jvm
+
+jobs:
+- name: unit-test-oidc-jvm
+  plan:
+    - get: oidc-jvm-src
+      trigger: true
+    - task: test
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: gradle
+            tag: jdk8-alpine
+        inputs:
+          - name: oidc-jvm-src
+        run:
+          user: root
+          dir: oidc-jvm-src/jvm
+          path: sh
+          args:
+            - -exc
+            - |
+              export TERM=dumb
+              apk update && \
+              apk upgrade && \
+              apk add git
+              gradle clean test --stacktrace
+
+- name: ship-release-candidate
+  serial_groups:
+  - version
+  plan:
+  - get: oidc-jvm-src
+    passed: [unit-test-oidc-jvm]
+    trigger: true
+  - get: oidc-jvm-version
+    params: {pre: rc}
+  - put: oidc-jvm-src
+    params:
+      repository: oidc-jvm-src
+      tag: oidc-jvm-version/version
+      only_tag: true
+  - put: oidc-jvm-version
+    params:
+      file: oidc-jvm-version/version
+
+- name: publish-to-maven-snapshot
+  serial: true
+  plan:
+  - get: oidc-jvm-snapshot-src
+    trigger: true
+  - task: publish-to-maven-snapshots-repo
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: gradle
+          tag: jdk8-alpine
+      inputs:
+        - name: oidc-jvm-snapshot-src
+      run:
+        user: root
+        dir: oidc-jvm-snapshot-src/jvm
+        path: sh
+        args:
+          - -exc
+          - |
+            export TERM=dumb
+            pwd
+            apk update && \
+            apk upgrade && \
+            apk add git
+            tags=$(git tag)
+            gradle clean build -xtest uploadArchives
+
+- name: test-snapshot-version
+  serial: true
+  plan:
+  - get: oidc-jvm-snapshot-src
+    passed: [publish-to-maven-snapshot]
+    trigger: true
+  - task: integration-test
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: gradle
+          tag: jdk8-alpine
+      inputs:
+        - name: oidc-jvm-snapshot-src
+      run:
+        user: root
+        dir: oidc-jvm-snapshot-src/sampleapps/oidc-java-app
+        path: sh
+        args:
+          - -exc
+          - |
+            export TERM=dumb
+            pwd
+            apk update && \
+            apk upgrade && \
+            apk add git
+            tags=$(git tag)
+            gradle clean build
+      params:
+          CLIENT_ID: "dummy"
+          CLIENT_SECRET: "s3cr3t"
+
+- name: ship-rc-to-final
+  serial_groups: [version]
+  plan:
+  - get: oidc-jvm-snapshot-src
+    passed: [test-snapshot-version]
+  - get: oidc-jvm-version
+    params: {bump: final}
+  - put: oidc-jvm-snapshot-src
+    params:
+      repository: oidc-jvm-snapshot-src
+      rebase: true
+      tag: oidc-jvm-version/version
+      only_tag: true
+      tag_prefix: v
+  - put: oidc-jvm-version
+    params: {file: oidc-jvm-version/version}
+
+- name: delete-rc-tags
+  serial: true
+  plan:
+  - get: oidc-jvm-release-src
+    trigger: true
+  - task: delete-release-candidate-tags
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: alpine/git
+          tag: latest
+      inputs:
+        - name: oidc-jvm-release-src
+      outputs:
+      - name: out
+      run:
+        dir: oidc-jvm-release-src
+        path: sh
+        args:
+          - -ec
+          - |
+            export TERM=dumb
+            pwd
+            private_key_path=$TMPDIR/git-resource-private-key
+            echo "${PRIVATE_KEY}" > $private_key_path
+            if [ -s $private_key_path ]; then
+              chmod 0600 $private_key_path
+              eval $(ssh-agent)
+              trap "kill $SSH_AGENT_PID" 0
+              ssh-add $private_key_path >/dev/null
+              mkdir -p ~/.ssh
+              cat > ~/.ssh/config <<EOF
+            StrictHostKeyChecking no
+            LogLevel quiet
+            EOF
+              chmod 0600 ~/.ssh/config
+              git fetch
+              tags=$(git tag)
+              echo ${tags}
+              tagToDelete=$(git tag | grep "rc." | tail -n1)
+              echo "${tagToDelete}"
+              if [ ! -z "${tagToDelete}" -a "${tagToDelete}" != " " ]; then
+                git tag -d ${tagToDelete}
+                git push --delete origin ${tagToDelete}
+                echo "deleted ${tagToDelete} successfully"
+              fi
+            fi
+      params:
+          PRIVATE_KEY: ((private_key))
+
+- name: major
+  plan:
+  - get: oidc-jvm-release-src
+    passed: [publish-to-maven-central]
+  - put: oidc-jvm-version
+    params: {bump: major, pre: rc}
+
+- name: minor
+  plan:
+  - get: oidc-jvm-release-src
+    passed: [publish-to-maven-central]
+  - put: oidc-jvm-version
+    params: {bump: minor, pre: rc}
+
+- name: patch
+  plan:
+  - get: oidc-jvm-release-src
+    passed: [publish-to-maven-central]
+  - put: oidc-jvm-version
+    params: {bump: patch, pre: rc}
+
+- name: publish-to-maven-central
+  plan:
+  - get: oidc-jvm-release-src
+    passed: [delete-rc-tags]
+  - task: build-and-publish
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: gradle
+          tag: jdk8-alpine
+      inputs:
+        - name: oidc-jvm-release-src
+      run:
+        user: root
+        dir: oidc-jvm-release-src/jvm
+        path: sh
+        args:
+          - -exc
+          - |
+            export TERM=dumb
+            apk update && \
+            apk upgrade && \
+            apk add git
+            tags=$(git tag)
+            gradle clean build uploadArchives --stacktrace

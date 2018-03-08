@@ -1,122 +1,122 @@
 #!/usr/bin/env bash
 
-format() {
-    local color=$1
-    local text=$2
-
-    case ${color} in
-    red*)
-      Message="$(tput setaf 1)$text$(tput sgr 0)"
-      ;;
-    green*)
-      Message="$(tput setaf 2)$text$(tput sgr 0)"
-      ;;
-    yellow)
-      Message="$(tput setaf 3)$text$(tput sgr 0)"
-      ;;
-    *)
-      Message=${text}
-      ;;
-    esac
-
-    echo "$Message"
-}
-
-greenTick() {
-    echo "$(format green "✔")"
-}
-
-check_for_wip_commit() {
-	while read local_ref local_sha remote_ref remote_sha
-	do
-		if [ "$local_sha" = $z40 ]
-		then
-			# Handle delete
-			:
-		else
-			if [ "$remote_sha" = $z40 ]
-			then
-				# New branch, examine all commits
-				range="$local_sha"
-			else
-				# Update to existing branch, examine new commits
-				range="$remote_sha..$local_sha"
-			fi
-
-			# Check for WIP commit
-			local commit=`git rev-list -n 1 --grep 'WIP' "$range"`
-			if [ -n "$commit" ]
-			then
-				echo >&2 "$(format red "Found WIP commit in ${local_ref}, not pushing")"
-				exit 1
-			fi
-		fi
-	done
-	echo "Checking for WIP Commits $(greenTick)"
-}
-
-check_for_unTracked_files() {
-    local unTrackedFiles=$(git ls-files --others --exclude-standard)
-
-    if [ -n "$unTrackedFiles" ]
-	then
-		echo >&2 "$(format red "Found Untracked files(s):")"
-		echo >&2 "$(format yellow "$unTrackedFiles")"
-		echo >&2 "Commit or Stash file(s) before pushing to $remote"
-		exit 1
-	fi
-	echo "Checking for un tracked files $(greenTick)"
-}
-
-pull() {
-	git pull --rebase
-
-	if [ $? -ne 0 ]
-	then
-	  echo >&2 "$(format red "Rebase failure, Cannot push to $remote")"
-	  exit 1
-	fi
-	echo "Applying latest changes from $remote $(greenTick)"
-}
-
-run_tests() {
-  cd jvm
-
-	./gradlew clean build publishToMavenLocal
-
-	if [ $? -ne 0 ]
-	then
-		echo >&2 "$(format red "Tests failed, Cannot push to $remote")"
-	  exit 1
-	fi
-  cd ..
-  cd sampleapps/oidc-java-app/
-  CLIENT_ID="a" CLIENT_SECRET="b" ./gradlew clean build
-
-  if [ $? -ne 0 ]
-	then
-		echo >&2 "$(format red "Cannot build sample apps, Cannot push to $remote")"
-	  exit 1
-	fi
-
-  cd ../..
-  echo "Running tests $(greenTick)"
-}
-
-upload_code_coverage() {
-  echo >&2 "$(format yellow "uploading code coverage report")"
-  cd jvm
-  bash <(curl -s https://codecov.io/bash) -t $OIDC_CODECOV_TOKEN
-  cd ..
-}
-
-remote="$1"
-url="$2"
-
-z40=0000000000000000000000000000000000000000
-
-check_for_wip_commit \
-&& check_for_unTracked_files \
-&& pull \
-&& run_tests \
-&& upload_code_coverage
+# format() {
+#     local color=$1
+#     local text=$2
+#
+#     case ${color} in
+#     red*)
+#       Message="$(tput setaf 1)$text$(tput sgr 0)"
+#       ;;
+#     green*)
+#       Message="$(tput setaf 2)$text$(tput sgr 0)"
+#       ;;
+#     yellow)
+#       Message="$(tput setaf 3)$text$(tput sgr 0)"
+#       ;;
+#     *)
+#       Message=${text}
+#       ;;
+#     esac
+#
+#     echo "$Message"
+# }
+#
+# greenTick() {
+#     echo "$(format green "✔")"
+# }
+#
+# check_for_wip_commit() {
+# 	while read local_ref local_sha remote_ref remote_sha
+# 	do
+# 		if [ "$local_sha" = $z40 ]
+# 		then
+# 			# Handle delete
+# 			:
+# 		else
+# 			if [ "$remote_sha" = $z40 ]
+# 			then
+# 				# New branch, examine all commits
+# 				range="$local_sha"
+# 			else
+# 				# Update to existing branch, examine new commits
+# 				range="$remote_sha..$local_sha"
+# 			fi
+#
+# 			# Check for WIP commit
+# 			local commit=`git rev-list -n 1 --grep 'WIP' "$range"`
+# 			if [ -n "$commit" ]
+# 			then
+# 				echo >&2 "$(format red "Found WIP commit in ${local_ref}, not pushing")"
+# 				exit 1
+# 			fi
+# 		fi
+# 	done
+# 	echo "Checking for WIP Commits $(greenTick)"
+# }
+#
+# check_for_unTracked_files() {
+#     local unTrackedFiles=$(git ls-files --others --exclude-standard)
+#
+#     if [ -n "$unTrackedFiles" ]
+# 	then
+# 		echo >&2 "$(format red "Found Untracked files(s):")"
+# 		echo >&2 "$(format yellow "$unTrackedFiles")"
+# 		echo >&2 "Commit or Stash file(s) before pushing to $remote"
+# 		exit 1
+# 	fi
+# 	echo "Checking for un tracked files $(greenTick)"
+# }
+#
+# pull() {
+# 	git pull --rebase
+#
+# 	if [ $? -ne 0 ]
+# 	then
+# 	  echo >&2 "$(format red "Rebase failure, Cannot push to $remote")"
+# 	  exit 1
+# 	fi
+# 	echo "Applying latest changes from $remote $(greenTick)"
+# }
+#
+# run_tests() {
+#   cd jvm
+#
+# 	./gradlew clean build publishToMavenLocal
+#
+# 	if [ $? -ne 0 ]
+# 	then
+# 		echo >&2 "$(format red "Tests failed, Cannot push to $remote")"
+# 	  exit 1
+# 	fi
+#   cd ..
+#   cd sampleapps/oidc-java-app/
+#   CLIENT_ID="a" CLIENT_SECRET="b" ./gradlew clean build
+#
+#   if [ $? -ne 0 ]
+# 	then
+# 		echo >&2 "$(format red "Cannot build sample apps, Cannot push to $remote")"
+# 	  exit 1
+# 	fi
+#
+#   cd ../..
+#   echo "Running tests $(greenTick)"
+# }
+#
+# upload_code_coverage() {
+#   echo >&2 "$(format yellow "uploading code coverage report")"
+#   cd jvm
+#   bash <(curl -s https://codecov.io/bash) -t $OIDC_CODECOV_TOKEN
+#   cd ..
+# }
+#
+# remote="$1"
+# url="$2"
+#
+# z40=0000000000000000000000000000000000000000
+#
+# check_for_wip_commit \
+# && check_for_unTracked_files \
+# && pull \
+# && run_tests \
+# && upload_code_coverage

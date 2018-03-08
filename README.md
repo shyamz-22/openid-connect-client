@@ -1,5 +1,7 @@
 # OpenID connect JVM client
 
+[![codecov](https://codecov.io/gh/shyamz-22/openid-connect-client/branch/master/graph/badge.svg)](https://codecov.io/gh/shyamz-22/openid-connect-client)   [![MavenCentral](https://maven-badges.herokuapp.com/maven-central/io.github.shyamz-22/oidc-jvm-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.shyamz-22/oidc-jvm-client)  [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 OpenId Connect Client written in Kotlin.
 
 # OpenID in a nutshell
@@ -11,6 +13,25 @@ This client is implemented with reference to [OpenID Connect Basic Client Implem
 # OpenID connect Basic Flow
 
 ![OpenID basic flow](oidcBasic.png)
+
+
+## Installation
+
+### Gradle
+
+```gradle
+compile 'io.github.shyamz-22:oidc-jvm-client:0.2.5'
+```
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>io.github.shyamz-22</groupId>
+    <artifactId>oidc-jvm-client</artifactId>
+    <version>0.2.5</version>
+</dependency>
+```
 
 
 # How to use the library

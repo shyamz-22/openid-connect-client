@@ -7,7 +7,6 @@ import io.github.shyamz.openidconnect.authorization.request.AuthorizationRequest
 import io.github.shyamz.openidconnect.response.OpenIdConnectCallBackInterceptor;
 import io.github.shyamz.openidconnect.response.model.AuthenticatedUser;
 import io.github.shyamz22.oidcclient.config.OidcUserToken;
-import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +17,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 @SpringBootApplication
 @Controller
 public class OidcClientApplication {
 
+    public static final String STATE_ATTR = "oidc-state";
     private final Set<String> scopes = Collections.singleton("email");
-    private Map<String, String> stateStore = new HashMap<>();
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -57,7 +60,7 @@ public class OidcClientApplication {
         AuthorizationRequest build = new AuthenticationRequestBuilder()
                 .basic()
                 .scope(scopes)
-                .state(stateGeneratorFunc(request))
+                .state(storeAndGet(request.getSession()))
                 .build();
 
         return "redirect:" + build.getAuthorizeUrl();
@@ -67,7 +70,7 @@ public class OidcClientApplication {
     public String handleCallback(HttpServletRequest request) {
 
         AuthenticatedUser authenticatedUser = new OpenIdConnectCallBackInterceptor(request)
-                .extractCode(stateStore.get(request.getSession().getId()))
+                .extractCode(String.valueOf(request.getSession().getAttribute(STATE_ATTR)))
                 .exchangeCodeForTokens()
                 .extractAuthenticatedUserInfo(null);
 
@@ -78,12 +81,11 @@ public class OidcClientApplication {
     }
 
     @NotNull
-    private Function0<String> stateGeneratorFunc(HttpServletRequest request) {
-        return () -> {
-            String state = UUID.randomUUID().toString();
-            stateStore.put(request.getSession().getId(), state);
-            return state;
-        };
+    private String storeAndGet(HttpSession session) {
+        String state = UUID.randomUUID().toString();
+        session.setAttribute(STATE_ATTR, state);
+        return state;
+
     }
 
     @Nullable

@@ -104,6 +104,7 @@ run_tests() {
 }
 
 upload_code_coverage() {
+  echo >&2 "$(format yellow "uploading code coverage report")"
   cd jvm
   bash <(curl -s https://codecov.io/bash) -t $OIDC_CODECOV_TOKEN
   cd ..

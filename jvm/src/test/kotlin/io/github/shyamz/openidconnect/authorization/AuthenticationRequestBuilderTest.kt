@@ -43,7 +43,7 @@ class AuthenticationRequestBuilderTest {
 
         val authenticationRequest = subject
                 .basic()
-                .state({ CLIENT_STATE_VALUE })
+                .state(CLIENT_STATE_VALUE)
                 .build()
 
         authenticationRequestAssert(authenticationRequest)
@@ -139,7 +139,7 @@ class AuthenticationRequestBuilderTest {
         val authenticationRequest = subject
                 .basic()
                 .responseMode("query")
-                .nonce({ NONCE_VALUE })
+                .nonce(NONCE_VALUE)
                 .display(Display.Page)
                 .maxAge(3600)
                 .uiLocales(setOf("fr-CA", "fr", "en"))

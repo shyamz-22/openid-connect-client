@@ -1,4 +1,4 @@
-# OpenID connect JVM client
+# OpenID Connect JVM client
 
 [![codecov](https://codecov.io/gh/shyamz-22/openid-connect-client/branch/master/graph/badge.svg)](https://codecov.io/gh/shyamz-22/openid-connect-client)   [![MavenCentral](https://maven-badges.herokuapp.com/maven-central/io.github.shyamz-22/oidc-jvm-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.shyamz-22/oidc-jvm-client)  [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

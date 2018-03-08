@@ -1,8 +1,8 @@
 package io.github.shyamz.openidconnect.authorization.request
 
+import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.Display
 import io.github.shyamz.openidconnect.configuration.model.Prompt
-import io.github.shyamz.openidconnect.configuration.ClientConfiguration
 import io.github.shyamz.openidconnect.configuration.model.ResponseType
 import io.github.shyamz.openidconnect.exceptions.OpenIdConnectException
 import org.apache.http.client.utils.URIBuilder
@@ -21,13 +21,13 @@ class AuthenticationRequestBuilder {
         return this
     }
 
-    fun state(stateGenerator: () -> String): AuthenticationRequestBuilder {
-        authenticationRequestParams["state"] = stateGenerator.invoke()
+    fun state(stateVal: String): AuthenticationRequestBuilder {
+        authenticationRequestParams["state"] = stateVal
         return this
     }
 
-    fun nonce(nonceGenerator: () -> String): AuthenticationRequestBuilder {
-        authenticationRequestParams["nonce"] = nonceGenerator.invoke()
+    fun nonce(nonceVal: String): AuthenticationRequestBuilder {
+        authenticationRequestParams["nonce"] = nonceVal
         return this
     }
 
@@ -112,4 +112,5 @@ class AuthenticationRequestBuilder {
                     return this
                 } ?: scopes.toList()
     }
+
 }
